@@ -1,5 +1,6 @@
 import sys
 import os
+from concurrent import futures
 
 # This set of lines are needed to import the gRPC stubs.
 # The path of the stubs is relative to the current file, or absolute inside the container.
@@ -23,6 +24,15 @@ def greet(name="you"):
         # Call the service through the stub object.
         response = stub.SayHello(fraud_detection.HelloRequest(name=name))
     return response.greeting
+
+def detectfraud(items, user, credit_card, user_comment, billing_address, shipping_method, gift_wrapping, terms_accepted=False):
+    # Establish a connection with the fraud-detection gRPC service.
+    with grpc.insecure_channel("fraud_detection:50051") as channel:
+        # Create a stub object.
+        stub = fraud_detection_grpc.FraudDetectionServiceStub(channel)
+        # Call the service through the stub object.
+        response = stub.DetectFraud(fraud_detection.FraudDetectionRequest(items=items, user=user, credit_card=credit_card, user_comment=user_comment, billing_address=billing_address, shipping_method=shipping_method, gift_wrapping=gift_wrapping, terms_accepted=terms_accepted))
+    return response.response
 
 
 # Import Flask.
@@ -56,6 +66,7 @@ def checkout():
     """
     Responds with a JSON object containing the order ID, status, and suggested books.
     """
+    print("We are checking out")
     # Get request object data to json
     request_data = json.loads(request.data)
     items = request_data.get("items")
@@ -67,10 +78,32 @@ def checkout():
     gift_wrapping = request_data.get("giftWrapping")
     terms_accepted = request_data.get("termsAccepted")
 
+    print("We will now create the threads.")
+    with futures.ThreadPoolExecutor() as executor:
+        # Submit tasks to the executor
+        fraud_detection_future = executor.submit(detectfraud, items, user, credit_card, user_comment, billing_address, shipping_method, gift_wrapping, terms_accepted)
+        #transaction_verification_future = executor.submit(call_transaction_verification_service, order_data)
+        #suggestions_future = executor.submit(call_suggestions_service, order_data)
+
+        # Wait for all futures to complete
+        futures.wait([fraud_detection_future]) #, transaction_verification_future, suggestions_future])
+
+        # Get results
+        fraud_detection_result = fraud_detection_future.result()
+        #transaction_verification_result = transaction_verification_future.result()
+        #suggestions_result = suggestions_future.result()
+
+    # Combine results and make a decision
+    if fraud_detection_result.response: #or not transaction_verification_result.is_valid:
+        order_status = "Order Rejected"
+    else:
+        order_status = "Order Approved"
+    print(order_status + "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
+
     # Dummy response following the provided YAML specification for the bookstore
     order_status_response = {
         "orderId": "12345",
-        "status": "Order Approved",
+        "status": order_status,
         "suggestedBooks": [
             {"bookId": "123", "title": "The Best Book", "author": "Author 1"},
             {"bookId": "456", "title": "The Second Best Book", "author": "Author 2"},

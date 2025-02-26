@@ -6,10 +6,29 @@ service HelloService {
     rpc SayHello (HelloRequest) returns (HelloResponse);
 }
 
+service FraudDetectionService {
+    rpc DetectFraud (FraudDetectionRequest) returns (FraudDetectionResponse);
+}
+
 message HelloRequest {
     string name = 1;
 }
 
 message HelloResponse {
     string greeting = 1;
+}
+
+message FraudDetectionRequest {
+    string items = 1;
+    string user = 2;
+    string credit_card = 3;
+    string user_comment = 4;
+    string billing_address = 5;
+    string shipping_method = 6;
+    string gift_wrapping = 7;
+    string terms_accepted = 8;
+}
+
+message FraudDetectionResponse {
+    bool response = 1;
 }
