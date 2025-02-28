@@ -51,15 +51,36 @@ def handle_fraud_detection(order_data):
     """
     Process the fraud detection for the given order data.
     """
-    # Establish a connection with the fraud-detection gRPC service.
-    with grpc.insecure_channel('fraud_detection:50051') as channel:
-        # Create a stub object.
+    with grpc.insecure_channel("fraud_detection:50051") as channel:
         stub = fraud_detection_grpc.FraudDetectionServiceStub(channel)
-        # Call the service through the stub object.
-        response = stub.CheckFraud(fraud_detection.FraudDetectionRequest(orderData=order_data))
+
+        # Build the gRPC request properly
+        fraud_request = fraud_detection.FraudDetectionRequest(
+            user=fraud_detection.User(
+                name=order_data["user"]["name"],
+                email=order_data["user"]["email"]
+            ),
+            credit_card=fraud_detection.CreditCard(
+                number=order_data["credit_card"]["number"],
+                expiration_date=order_data["credit_card"]["expiration_date"],
+                cvv=order_data["credit_card"]["cvv"]
+            ),
+            user_comment=order_data["user_comment"],
+            billing_address=fraud_detection.Address(
+                street=order_data["billing_address"]["street"],
+                city=order_data["billing_address"]["city"],
+                state=order_data["billing_address"]["state"],
+                zip=order_data["billing_address"]["zip"],
+                country=order_data["billing_address"]["country"]
+            )
+        )
+
+        response = stub.CheckFraud(fraud_request)
+    
     return response
 
 @app.route('/checkout', methods=['POST'])
+
 def checkout():
     """
     Responds with a JSON object containing the order ID, status, and suggested books.
@@ -92,10 +113,12 @@ def checkout():
                 "street": billing_address.get("street"),
                 "city": billing_address.get("city"),
                 "state": billing_address.get("state"),
-                "zip": billing_address.get("zipCode"),
+                "zip": billing_address.get("zip"),
                 "country": billing_address.get("country")
             }
         }
+
+        print("Fraud Detection Request Data", fraud_detection_request_data)
 
         # Concurrency executor
         with futures.ThreadPoolExecutor() as executor:
@@ -104,8 +127,9 @@ def checkout():
             # Wait for the results
             fraud_detection_result = future_fraud_detection.result()
 
+        print(fraud_detection_result)
         # Check if FraudDetectionService found fraud
-        if fraud_detection_result.isFraudulent:
+        if fraud_detection_result.is_fraudulent:
             order_status_response = {
                 'orderId': '12345',
                 'status': 'Order Rejected - Fraud Detected',

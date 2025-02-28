@@ -33,19 +33,24 @@ class FraudDetectionService(fraud_detection_grpc.FraudDetectionServiceServicer):
         Dummy implementation of the CheckFraud method.
         """
         # Extract order data from the request
-        order_data = request.orderData
+        fraud_data = {
+            "user": request.user,
+            "user_comment": request.user_comment,
+            "billing_address": request.billing_address,
+            "credit_card": request.credit_card
+        }
 
         # Dummy logic to determine if the order is fraudulent
         is_fraudulent = False
-        if order_data.message == "fraud":
+        if fraud_data["user_comment"] == "fraud":
             is_fraudulent = True
 
         # Create a FraudDetectionResponse object
         response = fraud_detection.FraudDetectionResponse()
-        response.isFraudulent = is_fraudulent
+        response.is_fraudulent = is_fraudulent
 
         # Print the fraud detection result
-        print(f"Fraud detection result for order: {order_data} - Fraudulent: {is_fraudulent}")
+        print(f"Fraud detection result for order: {is_fraudulent}")
 
         # Return the response object
         return response
