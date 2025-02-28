@@ -28,6 +28,8 @@ def greet(name='you'):
 from flask import Flask, request
 from flask_cors import CORS
 import json
+# Import utils for concurrent procesing
+from concurrent import futures
 
 # Create a simple Flask app.
 app = Flask(__name__)
@@ -45,27 +47,102 @@ def index():
     # Return the response.
     return response
 
+def handle_fraud_detection(order_data):
+    """
+    Process the fraud detection for the given order data.
+    """
+    # Establish a connection with the fraud-detection gRPC service.
+    with grpc.insecure_channel('fraud_detection:50051') as channel:
+        # Create a stub object.
+        stub = fraud_detection_grpc.FraudDetectionServiceStub(channel)
+        # Call the service through the stub object.
+        response = stub.CheckFraud(fraud_detection.FraudDetectionRequest(orderData=order_data))
+    return response
+
 @app.route('/checkout', methods=['POST'])
 def checkout():
     """
     Responds with a JSON object containing the order ID, status, and suggested books.
     """
-    # Get request object data to json
-    request_data = json.loads(request.data)
-    # Print request object data
-    print("Request Data:", request_data.get('items'))
+    try:
+        # Get request object data to json
+        request_data = json.loads(request.data)
+        # Print request object data
+        items = request_data.get("items")
+        user = request_data.get("user")
+        credit_card = request_data.get("creditCard")
+        user_comment = request_data.get("userComment")
+        billing_address = request_data.get("billingAddress")
+        shipping_method = request_data.get("shippingMethod")
+        gift_wrapping = request_data.get("giftWrapping")
+        terms_accepted = request_data.get("termsAccepted")
 
-    # Dummy response following the provided YAML specification for the bookstore
-    order_status_response = {
-        'orderId': '12345',
-        'status': 'Order Approved',
-        'suggestedBooks': [
-            {'bookId': '123', 'title': 'The Best Book', 'author': 'Author 1'},
-            {'bookId': '456', 'title': 'The Second Best Book', 'author': 'Author 2'}
-        ]
-    }
+        fraud_detection_request_data = {
+            "user": {
+                "name": user.get("name"),
+                "email": user.get("contact")
+            },
+            "credit_card": {
+                "number": credit_card.get("number"),
+                "expiration_date": credit_card.get("expirationDate"),
+                "cvv": credit_card.get("cvv")
+            },
+            "user_comment": user_comment,
+            "billing_address": {
+                "street": billing_address.get("street"),
+                "city": billing_address.get("city"),
+                "state": billing_address.get("state"),
+                "zip": billing_address.get("zipCode"),
+                "country": billing_address.get("country")
+            }
+        }
 
-    return order_status_response
+        # Concurrency executor
+        with futures.ThreadPoolExecutor() as executor:
+            # Dispatch the order data to the fraud detection service
+            future_fraud_detection = executor.submit(handle_fraud_detection, fraud_detection_request_data)
+            # Wait for the results
+            fraud_detection_result = future_fraud_detection.result()
+
+        # Check if FraudDetectionService found fraud
+        if fraud_detection_result.isFraudulent:
+            order_status_response = {
+                'orderId': '12345',
+                'status': 'Order Rejected - Fraud Detected',
+                'suggestedBooks': []
+            }
+            return json.dumps(order_status_response), 200
+        else:
+            # No fraud detected, continue evaluation
+            # Dummy response following the provided YAML specification for the bookstore
+            order_status_response = {
+                'orderId': '12345',
+                'status': 'Order Approved',
+                'suggestedBooks': [
+                    {'bookId': '123', 'title': 'The Best Book', 'author': 'Author 1'},
+                    {'bookId': '456', 'title': 'The Second Best Book', 'author': 'Author 2'}
+                ]
+            }
+
+        return json.dumps(order_status_response), 200
+
+    except KeyError as e:
+        error_response = {
+            'error': {
+                'code': '400',
+                'message': f'Missing key: {str(e)}'
+            }
+        }
+        return json.dumps(error_response), 400
+
+    except Exception as e:
+        error_response = {
+            'error': {
+                'code': '500',
+                'message': f'Internal server error: {str(e)}'
+            }
+        }
+        return json.dumps(error_response), 500
 
 
 if __name__ == '__main__':

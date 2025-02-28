@@ -27,11 +27,36 @@ class HelloService(fraud_detection_grpc.HelloServiceServicer):
         # Return the response object
         return response
 
+class FraudDetectionService(fraud_detection_grpc.FraudDetectionServiceServicer):
+    def CheckFraud(self, request, context):
+        """
+        Dummy implementation of the CheckFraud method.
+        """
+        # Extract order data from the request
+        order_data = request.orderData
+
+        # Dummy logic to determine if the order is fraudulent
+        is_fraudulent = False
+        if order_data.message == "fraud":
+            is_fraudulent = True
+
+        # Create a FraudDetectionResponse object
+        response = fraud_detection.FraudDetectionResponse()
+        response.isFraudulent = is_fraudulent
+
+        # Print the fraud detection result
+        print(f"Fraud detection result for order: {order_data} - Fraudulent: {is_fraudulent}")
+
+        # Return the response object
+        return response
+
 def serve():
     # Create a gRPC server
     server = grpc.server(futures.ThreadPoolExecutor())
     # Add HelloService
     fraud_detection_grpc.add_HelloServiceServicer_to_server(HelloService(), server)
+    # Add FraudDetectionService
+    fraud_detection_grpc.add_FraudDetectionServiceServicer_to_server(FraudDetectionService(), server) 
     # Listen on port 50051
     port = "50051"
     server.add_insecure_port("[::]:" + port)
