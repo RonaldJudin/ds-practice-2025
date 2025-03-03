@@ -45,7 +45,26 @@ class TransactionVerificationService(
 ):
     def VerifyTransaction(self, request, context):
         """
-        Dummy implementation of the VerifyTransaction method.
+        Verifies a transaction based on the sentiment of a quote from the Kanye West API.
+
+        This function handles the transaction verification process by fetching a random quote
+        from the Kanye West API and analyzing its sentiment using the TextBlob NLP library. If the sentiment
+        is positive, the transaction is marked as verified. If the sentiment is negative or if
+        no quote is retrieved, the transaction is marked as unverified.
+
+        Args:
+            request: The transaction verification request object containing details about the transaction.
+            context: The gRPC context for handling the request.
+
+        Returns:
+            transaction_verification.TransactionVerificationResponse: A response object indicating
+            whether the transaction is verified (True) or unverified (False).
+
+        Logs:
+            - Logs the receipt of the request.
+            - Logs if Kanye West refuses to provide a quote.
+            - Logs if Kanye West approves or refuses the transaction based on sentiment analysis.
+            - Logs the sending of the response.
         """
         logger.info("Transaction Verification Service: Request received.")
 

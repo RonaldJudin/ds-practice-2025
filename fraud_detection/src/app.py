@@ -43,7 +43,23 @@ class HelloService(fraud_detection_grpc.HelloServiceServicer):
 class FraudDetectionService(fraud_detection_grpc.FraudDetectionServiceServicer):
     def CheckFraud(self, request, context):
         """
-        Cross-check Interpol Red Notice DB with the user's data to determine if the order is fraudulent.
+        Detects potential fraud in a transaction by checking if the user is listed in the FBI Wanted API.
+
+        This function processes a fraud detection request by extracting user and transaction details
+        from the request. It then queries the FBI Wanted API to determine if the user is listed as
+        wanted. If the user is found in the FBI Wanted list, the transaction is flagged as fraudulent.
+
+        Args:
+            request: The fraud detection request object containing user and transaction details.
+            context: The gRPC context for handling the request.
+
+        Returns:
+            fraud_detection.FraudDetectionResponse: A response object indicating whether the
+            transaction is flagged as fraudulent (True) or not (False).
+
+        Logs:
+            - Logs the receipt of the request.
+            - Logs the sending of the response.
         """
         logger.info("Fraud Detection Service: Request recieved.")
         # Extract order data from the request
@@ -95,4 +111,3 @@ def serve():
 
 if __name__ == "__main__":
     serve()
-

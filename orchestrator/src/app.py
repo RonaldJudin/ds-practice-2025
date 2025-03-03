@@ -157,7 +157,22 @@ def handle_transaction_verification(transaction_data):
 @app.route("/checkout", methods=["POST"])
 def checkout():
     """
-    Responds with a JSON object containing the order ID, status, and suggested books.
+    Handles the checkout process for an order, including fraud detection, transaction verification,
+    and book suggestions.
+
+    This endpoint processes a POST request containing order details, performs fraud detection using
+    the FBI Wanted API, verifies the transaction using a sentiment analysis of a Kanye West quote,
+    and provides book suggestions from OpenLibrary. The response includes the order status and
+    suggested books.
+
+    Returns:
+        tuple: A JSON response containing the order ID, status, and suggested books, along with
+        an HTTP status code. If an error occurs, returns an appropriate error message and status code.
+
+    Logs:
+        - Logs the receipt of the request.
+        - Logs the progress and results of fraud detection, transaction verification, and suggestions.
+        - Logs errors if any occur during processing.
     """
     try:
         # Get request object data to json

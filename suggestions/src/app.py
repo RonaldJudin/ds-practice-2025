@@ -49,7 +49,25 @@ def get_random_book():
 class SuggestionsService(suggestions_grpc.SuggestionsServiceServicer):
     def GetSuggestions(self, request, context):
         """
-        Dummy implementation of the GetSuggestions method.
+        Provides book suggestions by scraping random books from the OpenLibrary website.
+
+        This function generates a list of suggested books by calling the `get_random_book`
+        function twice. Each book's title and author are scraped from OpenLibrary, and a unique
+        book ID is generated. The suggested books are added to the response object, which is
+        then returned to the client.
+
+        Args:
+            request: The suggestions request object (unused in this implementation).
+            context: The gRPC context for handling the request.
+
+        Returns:
+            suggestions.SuggestionsResponse: A response object containing a list of suggested books.
+
+        Logs:
+            - Logs the receipt of the request.
+            - Logs an error if a book cannot be scraped.
+            - Logs the successful retrieval of suggested books.
+            - Logs the sending of the response.
         """
         logger.info("Suggestions Service: Request received.")
 
@@ -93,4 +111,3 @@ def serve():
 
 if __name__ == "__main__":
     serve()
-
