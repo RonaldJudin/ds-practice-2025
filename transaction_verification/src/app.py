@@ -37,7 +37,7 @@ def analyze_sentiment(quote):
     blob = TextBlob(quote)
     # Polarity ranges from -1 to 1
     sentiment_score = blob.sentiment.polarity
-    return sentiment_score > 0
+    return sentiment_score > -0.2
 
 
 class TransactionVerificationService(
