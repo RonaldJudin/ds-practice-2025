@@ -25,7 +25,6 @@ import suggestions_pb2_grpc as suggestions_grpc
 import grpc
 from concurrent import futures
 
-
 def get_random_book():
     url = "https://openlibrary.org/random"
     response = requests.get(url, allow_redirects=True)

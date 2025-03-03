@@ -2,7 +2,7 @@
 """Client and server classes corresponding to protobuf-defined services."""
 import grpc
 
-import fraud_detection_pb2 as fraud__detection__pb2
+from utils.pb.fraud_detection import fraud_detection_pb2 as utils_dot_pb_dot_fraud__detection_dot_fraud__detection__pb2
 
 
 class HelloServiceStub(object):
@@ -35,8 +35,8 @@ def add_HelloServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
             'SayHello': grpc.unary_unary_rpc_method_handler(
                     servicer.SayHello,
-                    request_deserializer=fraud__detection__pb2.HelloRequest.FromString,
-                    response_serializer=fraud__detection__pb2.HelloResponse.SerializeToString,
+                    request_deserializer=utils_dot_pb_dot_fraud__detection_dot_fraud__detection__pb2.HelloRequest.FromString,
+                    response_serializer=utils_dot_pb_dot_fraud__detection_dot_fraud__detection__pb2.HelloResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(

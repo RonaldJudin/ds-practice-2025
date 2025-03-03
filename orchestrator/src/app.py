@@ -1,5 +1,6 @@
 import sys
 import os
+
 import logging
 
 logging.basicConfig(
@@ -41,7 +42,6 @@ def greet(name="you"):
         response = stub.SayHello(fraud_detection.HelloRequest(name=name))
     return response.greeting
 
-
 # Import Flask.
 # Flask is a web framework for Python.
 # It allows you to build a web application quickly.
@@ -69,7 +69,6 @@ def index():
     response = greet(name="orchestrator")
     # Return the response.
     return response
-
 
 def handle_fraud_detection(order_data):
     """
@@ -152,8 +151,7 @@ def handle_transaction_verification(transaction_data):
         response = stub.VerifyTransaction(transaction_verification_request)
 
     return response
-
-
+  
 @app.route("/checkout", methods=["POST"])
 def checkout():
     """

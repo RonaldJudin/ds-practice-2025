@@ -57,8 +57,7 @@ services:
       - ./utils:/app/utils
       # Mount the fraud_detection/src directory in the current directory to the /app/fraud_detection/src directory in the container
       - ./fraud_detection/src:/app/fraud_detection/src
-
-  suggestions:
+suggestions:
     build:
       # Use the current directory as the build context
       # This allows us to access the files in the current directory inside the Dockerfile
@@ -80,7 +79,6 @@ services:
       - ./utils:/app/utils
       # Mount the fraud_detection/src directory in the current directory to the /app/fraud_detection/src directory in the container
       - ./suggestions/src:/app/suggestions/src
-
   transaction_verification:
     build:
       # Use the current directory as the build context
