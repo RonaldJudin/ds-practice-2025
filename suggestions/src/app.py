@@ -47,6 +47,41 @@ def get_random_book():
 
 
 class SuggestionsService(suggestions_grpc.SuggestionsServiceServicer):
+    orders = {}
+    def InitOrder(self, request, context):
+        """
+        Initializes a new order in the suggestions system.
+
+        This function initializes a new order in the suggestions system by storing the order
+        details in a dictionary. The order details include the user, user comment, billing address,
+        and credit card information.
+
+        Args:
+            request: The order initialization request object containing order details.
+            context: The gRPC context for handling the request.
+
+        Returns:
+            suggestions.OrderInitResponse: A response object indicating the successful
+            initialization of the order.
+
+        Logs:
+            - Logs the receipt of the request.
+            - Logs the successful initialization of the order.
+            - Logs the sending of the response.
+        """
+        logger.info("Suggestions Service: Order initialization request received.")
+        # Store the order details in the orders dictionary
+        self.orders[request.order_id] = {
+            "user": request.user,
+            "user_comment": request.user_comment,
+            "billing_address": request.billing_address,
+            "credit_card": request.credit_card,
+        }
+        # Create an OrderInitResponse object
+        response = suggestions.OrderInitResponse()
+        response.message = "Order initialized successfully."
+        return response
+    
     def GetSuggestions(self, request, context):
         """
         Provides book suggestions by scraping random books from the OpenLibrary website.

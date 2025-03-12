@@ -43,6 +43,37 @@ def analyze_sentiment(quote):
 class TransactionVerificationService(
     transaction_verification_grpc.TransactionVerificationServiceServicer
 ):
+    orders = {}
+    def InitOrder(self, request, context):
+        """
+        Initializes a new order in the transaction verification system.
+
+        This function initializes a new order in the transaction verification system by storing the order
+        details in a dictionary. The order details include the user, user comment, billing address,
+        and credit card information.
+
+        Args:
+            request: The order initialization request object containing order details.
+            context: The gRPC context for handling the request.
+
+        Returns:
+            transaction_verification.OrderInitResponse: A response object indicating the successful
+            initialization of the order.
+        """
+        logger.info("Transaction Verification Service: Order initialization request received.")
+        # Create an OrderInitResponse object
+        response = transaction_verification.OrderInitResponse()
+        # Store the order details in the dictionary
+        self.orders[request.order_id] = {
+            "user": request.user,
+            "user_comment": request.user_comment,
+            "billing_address": request.billing_address,
+            "credit_card": request.credit_card,
+        }
+        response.order_id = request.order_id
+        logger.info("Transaction Verification Service: Order initialized.")
+        return response
+    
     def VerifyTransaction(self, request, context):
         """
         Verifies a transaction based on the sentiment of a quote from the Kanye West API.

@@ -1,6 +1,7 @@
 import sys
 import os
 import logging
+import uuid
 
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
@@ -187,7 +188,10 @@ def checkout():
         gift_wrapping = request_data.get("giftWrapping")
         terms_accepted = request_data.get("termsAccepted")
 
-        fraud_detection_request_data = {
+        order_id = str(uuid.uuid4())
+        print(f"Order ID: {order_id}")
+
+        order_data = {
             "user": {"name": user.get("name"), "email": user.get("contact")},
             "credit_card": {
                 "number": credit_card.get("number"),
@@ -210,7 +214,7 @@ def checkout():
         with futures.ThreadPoolExecutor() as executor:
             # Dispatch the order data to the fraud detection service
             future_fraud_detection = executor.submit(
-                handle_fraud_detection, fraud_detection_request_data
+                handle_fraud_detection, order_data
             )
             logger.info("Fraud Detection Service: Request sent.")
             # Wait for the results
@@ -231,25 +235,10 @@ def checkout():
 
         # No fraud detected, continue
         # Begin transaction verification workflow
-        transaction_verification_request_data = {
-            "user": {"name": user.get("name"), "email": user.get("contact")},
-            "credit_card": {
-                "number": credit_card.get("number"),
-                "expiration_date": credit_card.get("expirationDate"),
-                "cvv": credit_card.get("cvv"),
-            },
-            "billing_address": {
-                "street": billing_address.get("street"),
-                "city": billing_address.get("city"),
-                "state": billing_address.get("state"),
-                "zip": billing_address.get("zip"),
-                "country": billing_address.get("country"),
-            },
-        }
 
         with futures.ThreadPoolExecutor() as executor:
             future_transaction_verification = executor.submit(
-                handle_transaction_verification, transaction_verification_request_data
+                handle_transaction_verification, order_data
             )
             logger.info("Transaction Verification Service: Request sent.")
             transaction_verification_result = future_transaction_verification.result()
@@ -267,14 +256,9 @@ def checkout():
         logger.info("Transaction Verification Service: Transaction verified.")
 
         # Begin suggestions workflow
-        suggestions_request_data = {
-            "name": user.get("name"),
-            "email": user.get("contact"),
-        }
-
         with futures.ThreadPoolExecutor() as executor:
             future_suggestions = executor.submit(
-                handle_suggestions, suggestions_request_data
+                handle_suggestions, order_data
             )
             logger.info("Suggestions Service: Request sent.")
             suggestions_result = future_suggestions.result()
