@@ -17,18 +17,28 @@ class HelloResponse(_message.Message):
     def __init__(self, greeting: _Optional[str] = ...) -> None: ...
 
 class FraudDetectionRequest(_message.Message):
-    __slots__ = ("user", "credit_card", "user_comment", "billing_address")
+    __slots__ = ("user", "user_comment", "billing_address")
     USER_FIELD_NUMBER: _ClassVar[int]
-    CREDIT_CARD_FIELD_NUMBER: _ClassVar[int]
     USER_COMMENT_FIELD_NUMBER: _ClassVar[int]
     BILLING_ADDRESS_FIELD_NUMBER: _ClassVar[int]
     user: User
-    credit_card: CreditCard
     user_comment: str
     billing_address: Address
-    def __init__(self, user: _Optional[_Union[User, _Mapping]] = ..., credit_card: _Optional[_Union[CreditCard, _Mapping]] = ..., user_comment: _Optional[str] = ..., billing_address: _Optional[_Union[Address, _Mapping]] = ...) -> None: ...
+    def __init__(self, user: _Optional[_Union[User, _Mapping]] = ..., user_comment: _Optional[str] = ..., billing_address: _Optional[_Union[Address, _Mapping]] = ...) -> None: ...
 
 class FraudDetectionResponse(_message.Message):
+    __slots__ = ("is_fraudulent",)
+    IS_FRAUDULENT_FIELD_NUMBER: _ClassVar[int]
+    is_fraudulent: bool
+    def __init__(self, is_fraudulent: bool = ...) -> None: ...
+
+class CreditCardRequest(_message.Message):
+    __slots__ = ("credit_card",)
+    CREDIT_CARD_FIELD_NUMBER: _ClassVar[int]
+    credit_card: CreditCard
+    def __init__(self, credit_card: _Optional[_Union[CreditCard, _Mapping]] = ...) -> None: ...
+
+class CreditCardResponse(_message.Message):
     __slots__ = ("is_fraudulent",)
     IS_FRAUDULENT_FIELD_NUMBER: _ClassVar[int]
     is_fraudulent: bool

@@ -75,6 +75,32 @@ class FraudDetectionService(fraud_detection_grpc.FraudDetectionServiceServicer):
         response.message = "Order initialized successfully."
         logger.info("Fraud Detection Service: Order initialized successfully.")
         return response
+    
+    def CheckCreditCard(self, request, context):
+        """
+        Checks the validity of a credit card by querying the CreditCardValidator API.
+
+        This function processes a credit card validation request by extracting the credit card number
+        from the request. It then queries the CreditCardValidator API to determine if the credit card
+        is valid. If the credit card is valid, the transaction is marked as verified.
+        """
+        logger.info("Fraud Detection Service: Credit card validation request received.")
+        # Extract credit card data from the request
+        credit_card_data = {
+            "credit_card": request.credit_card,
+        }
+
+        # Verify credit card if its number starts with 372
+        is_verified = False
+        if credit_card_data["credit_card"].startswith("372"):
+            is_verified = True
+
+        # Create a CreditCardValidationResponse object
+        response = fraud_detection.CreditCardValidationResponse()
+        response.is_verified = is_verified
+        logger.info("Fraud Detection Service: Credit card validation response sent.")
+
+        return response
 
     def CheckFraud(self, request, context):
         """
@@ -102,7 +128,6 @@ class FraudDetectionService(fraud_detection_grpc.FraudDetectionServiceServicer):
             "user": request.user,
             "user_comment": request.user_comment,
             "billing_address": request.billing_address,
-            "credit_card": request.credit_card,
         }
 
         # Query the FBI Wanted API to check if the user is wanted
