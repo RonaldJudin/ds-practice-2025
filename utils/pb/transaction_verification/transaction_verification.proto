@@ -3,18 +3,64 @@ syntax = "proto3";
 package transaction_verification;
 
 service TransactionVerificationService {
+    rpc InitOrder (InitOrderRequest) returns (InitOrderResponse);
     rpc VerifyTransaction (TransactionVerificationRequest) returns (TransactionVerificationResponse);
+    rpc VerifyBookList (TVRequest) returns (VerifyBookListResponse);
+    rpc VerifyUserData (TVRequest) returns (VerifyUserDataResponse);
+    rpc VerifyCreditCardFormat (TVRequest) returns (VerifyCreditCardFormatResponse);
+}
+
+message InitOrderRequest {
+    string order_id = 1;
+    repeated Book items = 2;
+    User user = 3;
+    CreditCard credit_card = 4;
+    string user_comment = 5;
+    Address billing_address = 6;
+    string shipping_method = 7;
+    bool gift_wrapping = 8;
+    bool terms_accepted = 9;
+}
+
+message InitOrderResponse {
+    string order_id = 1;
 }
 
 message TransactionVerificationRequest {
-    User user = 1;
-    CreditCard credit_card = 2;
-    string user_comment = 3;
-    Address billing_address = 4;
+    string order_id = 1;
+    repeated string items = 2;
+    User user = 3;
+    CreditCard credit_card = 4;
+    string user_comment = 5;
+    Address billing_address = 6;
+    string shipping_method = 7;
+    bool gift_wrapping = 8;
+    bool terms_accepted = 9;
 }
 
 message TransactionVerificationResponse {
     bool is_verified = 1;
+}
+
+message TVRequest {
+    string order_id = 1;
+}
+
+message VerifyBookListResponse {
+    bool is_verified = 1;
+}
+
+message VerifyUserDataResponse {
+    bool is_verified = 1;
+}
+
+message VerifyCreditCardFormatResponse {
+    bool is_verified = 1;
+}
+
+message Book {
+    string name = 1;
+    int32 quantity = 2;
 }
 
 message User {

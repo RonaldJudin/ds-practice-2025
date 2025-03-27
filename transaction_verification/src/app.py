@@ -61,17 +61,51 @@ class TransactionVerificationService(
             initialization of the order.
         """
         logger.info("Transaction Verification Service: Order initialization request received.")
-        # Create an OrderInitResponse object
-        response = transaction_verification.OrderInitResponse()
+        # Create an InitOrderResponse object
+        response = transaction_verification.InitOrderResponse()
         # Store the order details in the dictionary
         self.orders[request.order_id] = {
+            "items": request.items,
             "user": request.user,
             "user_comment": request.user_comment,
             "billing_address": request.billing_address,
             "credit_card": request.credit_card,
+            "shipping_method": request.shipping_method,
+            "gift_wrapping": request.gift_wrapping,
+            "terms_accepted": request.terms_accepted,
         }
         response.order_id = request.order_id
         logger.info("Transaction Verification Service: Order initialized.")
+        return response
+    
+    def VerifyBookList(self, request, context):
+        # Extract the book list from the request
+        book_list = self.orders[request.order_id].items
+        # Create a CheckBookListResponse object
+        response = transaction_verification.VerifyBookListResponse()
+        # Check if the book list is empty
+        response.is_verified = False
+        if book_list:
+            response.is_verified = True
+        return response
+    
+    def VerifyUserData(self, request, context):
+        # Extract user data from the request
+        logger.info(self.orders)
+        user_data = self.orders[request.order_id].user
+        billing_address = self.orders[request.order_id].billing_address
+        credit_card = self.orders[request.order_id].credit_card
+        # Check that no fields in these data are empty
+        response = transaction_verification.VerifyUserDataResponse()
+        response.is_verified = user_data.name and user_data.email and billing_address.street and billing_address.city and billing_address.state and billing_address.zip and billing_address.country and credit_card.number and credit_card.expiration_date and credit_card.cvv
+        return response
+    
+    def VerifyCreditCardFormat(self, request, context):
+        # Extract credit card data from the request
+        credit_card_data = self.orders[request.order_id].credit_card
+        # Check if the credit card number is 16 digits, expiration date is in MM/YY format, and CVV is 3 digits
+        response = transaction_verification.VerifyCreditCardFormatResponse()
+        response.is_verified = len(credit_card_data.number) == 16 and len(credit_card_data.expiration_date) == 5 and len(credit_card_data.cvv) == 3
         return response
     
     def VerifyTransaction(self, request, context):

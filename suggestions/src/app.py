@@ -70,16 +70,20 @@ class SuggestionsService(suggestions_grpc.SuggestionsServiceServicer):
             - Logs the sending of the response.
         """
         logger.info("Suggestions Service: Order initialization request received.")
-        # Store the order details in the orders dictionary
+        # Create an InitOrderResponse object
+        response = suggestions.InitOrderResponse()
+        # Store the order details in the dictionary
         self.orders[request.order_id] = {
+            "items": request.items,
             "user": request.user,
             "user_comment": request.user_comment,
             "billing_address": request.billing_address,
             "credit_card": request.credit_card,
+            "shipping_method": request.shipping_method,
+            "gift_wrapping": request.gift_wrapping,
+            "terms_accepted": request.terms_accepted,
         }
-        # Create an OrderInitResponse object
-        response = suggestions.OrderInitResponse()
-        response.message = "Order initialized successfully."
+        response.order_id = request.order_id
         return response
     
     def GetSuggestions(self, request, context):

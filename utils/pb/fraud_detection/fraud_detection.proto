@@ -7,8 +7,25 @@ service HelloService {
 }
 
 service FraudDetectionService {
+    rpc InitOrder (InitOrderRequest) returns (InitOrderResponse);
     rpc CheckFraud (FraudDetectionRequest) returns (FraudDetectionResponse);
     rpc CheckCreditCard (CreditCardRequest) returns (CreditCardResponse);
+}
+
+message InitOrderRequest {
+    string order_id = 1;
+    repeated Book items = 2;
+    User user = 3;
+    CreditCard credit_card = 4;
+    string user_comment = 5;
+    Address billing_address = 6;
+    string shipping_method = 7;
+    bool gift_wrapping = 8;
+    bool terms_accepted = 9;
+}
+
+message InitOrderResponse {
+    string order_id = 1;
 }
 
 message HelloRequest {
@@ -20,9 +37,7 @@ message HelloResponse {
 }
 
 message FraudDetectionRequest {
-    User user = 1;
-    string user_comment = 2;
-    Address billing_address = 3;
+    string order_id = 1;
 }
 
 message FraudDetectionResponse {
@@ -30,11 +45,16 @@ message FraudDetectionResponse {
 }
 
 message CreditCardRequest {
-    CreditCard credit_card = 1;
+    string order_id = 1;
 }
 
 message CreditCardResponse {
-    bool is_fraudulent = 1;
+    bool is_verified = 1;
+}
+
+message Book {
+    string name = 1;
+    int32 quantity = 2;
 }
 
 message User {

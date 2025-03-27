@@ -39,7 +39,6 @@ class HelloService(fraud_detection_grpc.HelloServiceServicer):
         # Return the response object
         return response
 
-
 class FraudDetectionService(fraud_detection_grpc.FraudDetectionServiceServicer):
     orders = {}
     def InitOrder(self, request, context):
@@ -62,17 +61,20 @@ class FraudDetectionService(fraud_detection_grpc.FraudDetectionServiceServicer):
             - Logs the receipt of the request.
             - Logs the successful initialization of the order.
         """
-        logger.info("Fraud Detection Service: Order initialization request received.")
         # Store the order details in the orders dictionary
         self.orders[request.order_id] = {
+            "items": request.items,
             "user": request.user,
             "user_comment": request.user_comment,
             "billing_address": request.billing_address,
             "credit_card": request.credit_card,
+            "shipping_method": request.shipping_method,
+            "gift_wrapping": request.gift_wrapping,
+            "terms_accepted": request.terms_accepted,
         }
-        # Create an OrderInitResponse object
-        response = fraud_detection.OrderInitResponse()
-        response.message = "Order initialized successfully."
+        # Create an InitOrderResponse object
+        response = fraud_detection.InitOrderResponse()
+        response.order_id = request.order_id
         logger.info("Fraud Detection Service: Order initialized successfully.")
         return response
     
@@ -86,17 +88,15 @@ class FraudDetectionService(fraud_detection_grpc.FraudDetectionServiceServicer):
         """
         logger.info("Fraud Detection Service: Credit card validation request received.")
         # Extract credit card data from the request
-        credit_card_data = {
-            "credit_card": request.credit_card,
-        }
+        credit_card_data = self.orders[request.order_id]["credit_card"],
 
         # Verify credit card if its number starts with 372
         is_verified = False
-        if credit_card_data["credit_card"].startswith("372"):
+        if credit_card_data["number"].startswith("372"):
             is_verified = True
 
-        # Create a CreditCardValidationResponse object
-        response = fraud_detection.CreditCardValidationResponse()
+        # Create a CreditCardResponse object
+        response = fraud_detection.CreditCardResponse()
         response.is_verified = is_verified
         logger.info("Fraud Detection Service: Credit card validation response sent.")
 
@@ -125,9 +125,9 @@ class FraudDetectionService(fraud_detection_grpc.FraudDetectionServiceServicer):
         logger.info("Fraud Detection Service: Request recieved.")
         # Extract order data from the request
         fraud_data = {
-            "user": request.user,
-            "user_comment": request.user_comment,
-            "billing_address": request.billing_address,
+            "user": self.orders[request.order_id]["user"],
+            "user_comment": self.orders[request.order_id]["user_comment"],
+            "billing_address": self.orders[request.order_id]["billing_address"],
         }
 
         # Query the FBI Wanted API to check if the user is wanted

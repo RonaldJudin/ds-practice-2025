@@ -14,21 +14,31 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x11suggestions.proto\x12\x0bsuggestions\"5\n\x12SuggestionsRequest\x12\x1f\n\x04user\x18\x01 \x01(\x0b\x32\x11.suggestions.User\"A\n\x13SuggestionsResponse\x12*\n\x0fsuggested_books\x18\x01 \x03(\x0b\x32\x11.suggestions.Book\"#\n\x04User\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\r\n\x05\x65mail\x18\x02 \x01(\t\"5\n\x04\x42ook\x12\x0e\n\x06\x62ookId\x18\x01 \x01(\t\x12\r\n\x05title\x18\x02 \x01(\t\x12\x0e\n\x06\x61uthor\x18\x03 \x01(\t2i\n\x12SuggestionsService\x12S\n\x0eGetSuggestions\x12\x1f.suggestions.SuggestionsRequest\x1a .suggestions.SuggestionsResponseb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x11suggestions.proto\x12\x0bsuggestions\"\xa7\x02\n\x10InitOrderRequest\x12\x10\n\x08order_id\x18\x01 \x01(\t\x12%\n\x05items\x18\x02 \x03(\x0b\x32\x16.suggestions.BookOrder\x12\x1f\n\x04user\x18\x03 \x01(\x0b\x32\x11.suggestions.User\x12,\n\x0b\x63redit_card\x18\x04 \x01(\x0b\x32\x17.suggestions.CreditCard\x12\x14\n\x0cuser_comment\x18\x05 \x01(\t\x12-\n\x0f\x62illing_address\x18\x06 \x01(\x0b\x32\x14.suggestions.Address\x12\x17\n\x0fshipping_method\x18\x07 \x01(\t\x12\x15\n\rgift_wrapping\x18\x08 \x01(\x08\x12\x16\n\x0eterms_accepted\x18\t \x01(\x08\"%\n\x11InitOrderResponse\x12\x10\n\x08order_id\x18\x01 \x01(\t\"&\n\x12SuggestionsRequest\x12\x10\n\x08order_id\x18\x01 \x01(\t\"A\n\x13SuggestionsResponse\x12*\n\x0fsuggested_books\x18\x01 \x03(\x0b\x32\x11.suggestions.Book\"+\n\tBookOrder\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x10\n\x08quantity\x18\x02 \x01(\x05\"#\n\x04User\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\r\n\x05\x65mail\x18\x02 \x01(\t\"5\n\x04\x42ook\x12\x0e\n\x06\x62ookId\x18\x01 \x01(\t\x12\r\n\x05title\x18\x02 \x01(\t\x12\x0e\n\x06\x61uthor\x18\x03 \x01(\t\"B\n\nCreditCard\x12\x0e\n\x06number\x18\x01 \x01(\t\x12\x17\n\x0f\x65xpiration_date\x18\x02 \x01(\t\x12\x0b\n\x03\x63vv\x18\x03 \x01(\t\"T\n\x07\x41\x64\x64ress\x12\x0e\n\x06street\x18\x01 \x01(\t\x12\x0c\n\x04\x63ity\x18\x02 \x01(\t\x12\r\n\x05state\x18\x03 \x01(\t\x12\x0b\n\x03zip\x18\x04 \x01(\t\x12\x0f\n\x07\x63ountry\x18\x05 \x01(\t2\xb5\x01\n\x12SuggestionsService\x12J\n\tInitOrder\x12\x1d.suggestions.InitOrderRequest\x1a\x1e.suggestions.InitOrderResponse\x12S\n\x0eGetSuggestions\x12\x1f.suggestions.SuggestionsRequest\x1a .suggestions.SuggestionsResponseb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
 _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'suggestions_pb2', _globals)
 if _descriptor._USE_C_DESCRIPTORS == False:
   DESCRIPTOR._options = None
-  _globals['_SUGGESTIONSREQUEST']._serialized_start=34
-  _globals['_SUGGESTIONSREQUEST']._serialized_end=87
-  _globals['_SUGGESTIONSRESPONSE']._serialized_start=89
-  _globals['_SUGGESTIONSRESPONSE']._serialized_end=154
-  _globals['_USER']._serialized_start=156
-  _globals['_USER']._serialized_end=191
-  _globals['_BOOK']._serialized_start=193
-  _globals['_BOOK']._serialized_end=246
-  _globals['_SUGGESTIONSSERVICE']._serialized_start=248
-  _globals['_SUGGESTIONSSERVICE']._serialized_end=353
+  _globals['_INITORDERREQUEST']._serialized_start=35
+  _globals['_INITORDERREQUEST']._serialized_end=330
+  _globals['_INITORDERRESPONSE']._serialized_start=332
+  _globals['_INITORDERRESPONSE']._serialized_end=369
+  _globals['_SUGGESTIONSREQUEST']._serialized_start=371
+  _globals['_SUGGESTIONSREQUEST']._serialized_end=409
+  _globals['_SUGGESTIONSRESPONSE']._serialized_start=411
+  _globals['_SUGGESTIONSRESPONSE']._serialized_end=476
+  _globals['_BOOKORDER']._serialized_start=478
+  _globals['_BOOKORDER']._serialized_end=521
+  _globals['_USER']._serialized_start=523
+  _globals['_USER']._serialized_end=558
+  _globals['_BOOK']._serialized_start=560
+  _globals['_BOOK']._serialized_end=613
+  _globals['_CREDITCARD']._serialized_start=615
+  _globals['_CREDITCARD']._serialized_end=681
+  _globals['_ADDRESS']._serialized_start=683
+  _globals['_ADDRESS']._serialized_end=767
+  _globals['_SUGGESTIONSSERVICE']._serialized_start=770
+  _globals['_SUGGESTIONSSERVICE']._serialized_end=951
 # @@protoc_insertion_point(module_scope)

@@ -3,15 +3,37 @@ syntax = "proto3";
 package suggestions;
 
 service SuggestionsService {
+    rpc InitOrder (InitOrderRequest) returns (InitOrderResponse);
     rpc GetSuggestions (SuggestionsRequest) returns (SuggestionsResponse);
 }
 
+message InitOrderRequest {
+    string order_id = 1;
+    repeated BookOrder items = 2;
+    User user = 3;
+    CreditCard credit_card = 4;
+    string user_comment = 5;
+    Address billing_address = 6;
+    string shipping_method = 7;
+    bool gift_wrapping = 8;
+    bool terms_accepted = 9;
+}
+
+message InitOrderResponse {
+    string order_id = 1;
+}
+
 message SuggestionsRequest {
-    User user = 1;
+    string order_id = 1;
 }
 
 message SuggestionsResponse {
     repeated Book suggested_books = 1;
+}
+
+message BookOrder {
+    string name = 1;
+    int32 quantity = 2;
 }
 
 message User {
@@ -23,4 +45,18 @@ message Book {
     string bookId = 1;
     string title = 2;
     string author = 3;
+}
+
+message CreditCard {
+    string number = 1;
+    string expiration_date = 2;
+    string cvv = 3;
+}
+
+message Address {
+    string street = 1;
+    string city = 2;
+    string state = 3;
+    string zip = 4;
+    string country = 5;
 }

@@ -14,33 +14,39 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x15\x66raud_detection.proto\x12\x0f\x66raud_detection\"\x1c\n\x0cHelloRequest\x12\x0c\n\x04name\x18\x01 \x01(\t\"!\n\rHelloResponse\x12\x10\n\x08greeting\x18\x01 \x01(\t\"\x85\x01\n\x15\x46raudDetectionRequest\x12#\n\x04user\x18\x01 \x01(\x0b\x32\x15.fraud_detection.User\x12\x14\n\x0cuser_comment\x18\x02 \x01(\t\x12\x31\n\x0f\x62illing_address\x18\x03 \x01(\x0b\x32\x18.fraud_detection.Address\"/\n\x16\x46raudDetectionResponse\x12\x15\n\ris_fraudulent\x18\x01 \x01(\x08\"E\n\x11\x43reditCardRequest\x12\x30\n\x0b\x63redit_card\x18\x01 \x01(\x0b\x32\x1b.fraud_detection.CreditCard\"+\n\x12\x43reditCardResponse\x12\x15\n\ris_fraudulent\x18\x01 \x01(\x08\"#\n\x04User\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\r\n\x05\x65mail\x18\x02 \x01(\t\"B\n\nCreditCard\x12\x0e\n\x06number\x18\x01 \x01(\t\x12\x17\n\x0f\x65xpiration_date\x18\x02 \x01(\t\x12\x0b\n\x03\x63vv\x18\x03 \x01(\t\"T\n\x07\x41\x64\x64ress\x12\x0e\n\x06street\x18\x01 \x01(\t\x12\x0c\n\x04\x63ity\x18\x02 \x01(\t\x12\r\n\x05state\x18\x03 \x01(\t\x12\x0b\n\x03zip\x18\x04 \x01(\t\x12\x0f\n\x07\x63ountry\x18\x05 \x01(\t2Y\n\x0cHelloService\x12I\n\x08SayHello\x12\x1d.fraud_detection.HelloRequest\x1a\x1e.fraud_detection.HelloResponse2\xd2\x01\n\x15\x46raudDetectionService\x12]\n\nCheckFraud\x12&.fraud_detection.FraudDetectionRequest\x1a\'.fraud_detection.FraudDetectionResponse\x12Z\n\x0f\x43heckCreditCard\x12\".fraud_detection.CreditCardRequest\x1a#.fraud_detection.CreditCardResponseb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x15\x66raud_detection.proto\x12\x0f\x66raud_detection\"\xb2\x02\n\x10InitOrderRequest\x12\x10\n\x08order_id\x18\x01 \x01(\t\x12$\n\x05items\x18\x02 \x03(\x0b\x32\x15.fraud_detection.Book\x12#\n\x04user\x18\x03 \x01(\x0b\x32\x15.fraud_detection.User\x12\x30\n\x0b\x63redit_card\x18\x04 \x01(\x0b\x32\x1b.fraud_detection.CreditCard\x12\x14\n\x0cuser_comment\x18\x05 \x01(\t\x12\x31\n\x0f\x62illing_address\x18\x06 \x01(\x0b\x32\x18.fraud_detection.Address\x12\x17\n\x0fshipping_method\x18\x07 \x01(\t\x12\x15\n\rgift_wrapping\x18\x08 \x01(\x08\x12\x16\n\x0eterms_accepted\x18\t \x01(\x08\"%\n\x11InitOrderResponse\x12\x10\n\x08order_id\x18\x01 \x01(\t\"\x1c\n\x0cHelloRequest\x12\x0c\n\x04name\x18\x01 \x01(\t\"!\n\rHelloResponse\x12\x10\n\x08greeting\x18\x01 \x01(\t\")\n\x15\x46raudDetectionRequest\x12\x10\n\x08order_id\x18\x01 \x01(\t\"/\n\x16\x46raudDetectionResponse\x12\x15\n\ris_fraudulent\x18\x01 \x01(\x08\"%\n\x11\x43reditCardRequest\x12\x10\n\x08order_id\x18\x01 \x01(\t\")\n\x12\x43reditCardResponse\x12\x13\n\x0bis_verified\x18\x01 \x01(\x08\"&\n\x04\x42ook\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x10\n\x08quantity\x18\x02 \x01(\x05\"#\n\x04User\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\r\n\x05\x65mail\x18\x02 \x01(\t\"B\n\nCreditCard\x12\x0e\n\x06number\x18\x01 \x01(\t\x12\x17\n\x0f\x65xpiration_date\x18\x02 \x01(\t\x12\x0b\n\x03\x63vv\x18\x03 \x01(\t\"T\n\x07\x41\x64\x64ress\x12\x0e\n\x06street\x18\x01 \x01(\t\x12\x0c\n\x04\x63ity\x18\x02 \x01(\t\x12\r\n\x05state\x18\x03 \x01(\t\x12\x0b\n\x03zip\x18\x04 \x01(\t\x12\x0f\n\x07\x63ountry\x18\x05 \x01(\t2Y\n\x0cHelloService\x12I\n\x08SayHello\x12\x1d.fraud_detection.HelloRequest\x1a\x1e.fraud_detection.HelloResponse2\xa6\x02\n\x15\x46raudDetectionService\x12R\n\tInitOrder\x12!.fraud_detection.InitOrderRequest\x1a\".fraud_detection.InitOrderResponse\x12]\n\nCheckFraud\x12&.fraud_detection.FraudDetectionRequest\x1a\'.fraud_detection.FraudDetectionResponse\x12Z\n\x0f\x43heckCreditCard\x12\".fraud_detection.CreditCardRequest\x1a#.fraud_detection.CreditCardResponseb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
 _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'fraud_detection_pb2', _globals)
 if _descriptor._USE_C_DESCRIPTORS == False:
   DESCRIPTOR._options = None
-  _globals['_HELLOREQUEST']._serialized_start=42
-  _globals['_HELLOREQUEST']._serialized_end=70
-  _globals['_HELLORESPONSE']._serialized_start=72
-  _globals['_HELLORESPONSE']._serialized_end=105
-  _globals['_FRAUDDETECTIONREQUEST']._serialized_start=108
-  _globals['_FRAUDDETECTIONREQUEST']._serialized_end=241
-  _globals['_FRAUDDETECTIONRESPONSE']._serialized_start=243
-  _globals['_FRAUDDETECTIONRESPONSE']._serialized_end=290
-  _globals['_CREDITCARDREQUEST']._serialized_start=292
-  _globals['_CREDITCARDREQUEST']._serialized_end=361
-  _globals['_CREDITCARDRESPONSE']._serialized_start=363
-  _globals['_CREDITCARDRESPONSE']._serialized_end=406
-  _globals['_USER']._serialized_start=408
-  _globals['_USER']._serialized_end=443
-  _globals['_CREDITCARD']._serialized_start=445
-  _globals['_CREDITCARD']._serialized_end=511
-  _globals['_ADDRESS']._serialized_start=513
-  _globals['_ADDRESS']._serialized_end=597
-  _globals['_HELLOSERVICE']._serialized_start=599
-  _globals['_HELLOSERVICE']._serialized_end=688
-  _globals['_FRAUDDETECTIONSERVICE']._serialized_start=691
-  _globals['_FRAUDDETECTIONSERVICE']._serialized_end=901
+  _globals['_INITORDERREQUEST']._serialized_start=43
+  _globals['_INITORDERREQUEST']._serialized_end=349
+  _globals['_INITORDERRESPONSE']._serialized_start=351
+  _globals['_INITORDERRESPONSE']._serialized_end=388
+  _globals['_HELLOREQUEST']._serialized_start=390
+  _globals['_HELLOREQUEST']._serialized_end=418
+  _globals['_HELLORESPONSE']._serialized_start=420
+  _globals['_HELLORESPONSE']._serialized_end=453
+  _globals['_FRAUDDETECTIONREQUEST']._serialized_start=455
+  _globals['_FRAUDDETECTIONREQUEST']._serialized_end=496
+  _globals['_FRAUDDETECTIONRESPONSE']._serialized_start=498
+  _globals['_FRAUDDETECTIONRESPONSE']._serialized_end=545
+  _globals['_CREDITCARDREQUEST']._serialized_start=547
+  _globals['_CREDITCARDREQUEST']._serialized_end=584
+  _globals['_CREDITCARDRESPONSE']._serialized_start=586
+  _globals['_CREDITCARDRESPONSE']._serialized_end=627
+  _globals['_BOOK']._serialized_start=629
+  _globals['_BOOK']._serialized_end=667
+  _globals['_USER']._serialized_start=669
+  _globals['_USER']._serialized_end=704
+  _globals['_CREDITCARD']._serialized_start=706
+  _globals['_CREDITCARD']._serialized_end=772
+  _globals['_ADDRESS']._serialized_start=774
+  _globals['_ADDRESS']._serialized_end=858
+  _globals['_HELLOSERVICE']._serialized_start=860
+  _globals['_HELLOSERVICE']._serialized_end=949
+  _globals['_FRAUDDETECTIONSERVICE']._serialized_start=952
+  _globals['_FRAUDDETECTIONSERVICE']._serialized_end=1246
 # @@protoc_insertion_point(module_scope)

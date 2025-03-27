@@ -71,18 +71,26 @@ def index():
     # Return the response.
     return response
 
-
-def handle_fraud_detection(order_data):
+def handle_init_order(order_data):
     """
-    Process the fraud detection for the given order data.
+    Process the order initialization for the given order data.
     """
     with grpc.insecure_channel("fraud_detection:50051") as channel:
+        logger.info("Fraud Detection Service: Order initialization request sent.")
         stub = fraud_detection_grpc.FraudDetectionServiceStub(channel)
 
+        #logger.info(order_data)
+        #logger.info([fraud_detection.Book(name=item["name"], quantity=item["quantity"]) for item in order_data["items"]])
+        #for data in order_data.values():
+        #    logger.info(data)
+        #    logger.info(type(data))
+
         # Build the gRPC request
-        fraud_request = fraud_detection.FraudDetectionRequest(
+        order_init_request = fraud_detection.InitOrderRequest(
+            order_id=order_data["order_id"],
+            items=[fraud_detection.Book(name=item["name"], quantity=item["quantity"]) for item in order_data["items"]],
             user=fraud_detection.User(
-                name=order_data["user"]["name"], email=order_data["user"]["email"]
+                name=order_data["user"]["name"], email=order_data["user"]["name"]
             ),
             credit_card=fraud_detection.CreditCard(
                 number=order_data["credit_card"]["number"],
@@ -97,6 +105,100 @@ def handle_fraud_detection(order_data):
                 zip=order_data["billing_address"]["zip"],
                 country=order_data["billing_address"]["country"],
             ),
+            shipping_method=order_data["shipping_method"],
+            gift_wrapping=order_data["gift_wrapping"],
+            terms_accepted=order_data["terms_accepted"],
+        )
+
+        response = stub.InitOrder(order_init_request)
+
+    with grpc.insecure_channel("suggestions:50052") as channel:
+        logger.info("Suggestions Service: Order initialization request sent.")
+        stub = suggestions_grpc.SuggestionsServiceStub(channel)
+
+        #logger.info(order_data)
+        #logger.info([fraud_detection.Book(name=item["name"], quantity=item["quantity"]) for item in order_data["items"]])
+        #for data in order_data.values():
+        #    logger.info(data)
+        #    logger.info(type(data))
+
+        # Build the gRPC request
+        order_init_request = suggestions.InitOrderRequest(
+            order_id=order_data["order_id"],
+            items=[suggestions.BookOrder(name=item["name"], quantity=item["quantity"]) for item in order_data["items"]],
+            user=suggestions.User(
+                name=order_data["user"]["name"], email=order_data["user"]["name"]
+            ),
+            credit_card=suggestions.CreditCard(
+                number=order_data["credit_card"]["number"],
+                expiration_date=order_data["credit_card"]["expiration_date"],
+                cvv=order_data["credit_card"]["cvv"],
+            ),
+            user_comment=order_data["user_comment"],
+            billing_address=suggestions.Address(
+                street=order_data["billing_address"]["street"],
+                city=order_data["billing_address"]["city"],
+                state=order_data["billing_address"]["state"],
+                zip=order_data["billing_address"]["zip"],
+                country=order_data["billing_address"]["country"],
+            ),
+            shipping_method=order_data["shipping_method"],
+            gift_wrapping=order_data["gift_wrapping"],
+            terms_accepted=order_data["terms_accepted"],
+        )
+
+        response = stub.InitOrder(order_init_request)
+    
+    with grpc.insecure_channel("transaction_verification:50053") as channel:
+        logger.info("Transaction Verification Service: Order initialization request sent.")
+        stub = transaction_verification_grpc.TransactionVerificationServiceStub(channel)
+
+        #logger.info(order_data)
+        #logger.info([fraud_detection.Book(name=item["name"], quantity=item["quantity"]) for item in order_data["items"]])
+        #for data in order_data.values():
+        #    logger.info(data)
+        #    logger.info(type(data))
+
+        # Build the gRPC request
+        order_init_request = transaction_verification.InitOrderRequest(
+            order_id=order_data["order_id"],
+            items=[transaction_verification.Book(name=item["name"], quantity=item["quantity"]) for item in order_data["items"]],
+            user=transaction_verification.User(
+                name=order_data["user"]["name"], email=order_data["user"]["name"]
+            ),
+            credit_card=transaction_verification.CreditCard(
+                number=order_data["credit_card"]["number"],
+                expiration_date=order_data["credit_card"]["expiration_date"],
+                cvv=order_data["credit_card"]["cvv"],
+            ),
+            user_comment=order_data["user_comment"],
+            billing_address=transaction_verification.Address(
+                street=order_data["billing_address"]["street"],
+                city=order_data["billing_address"]["city"],
+                state=order_data["billing_address"]["state"],
+                zip=order_data["billing_address"]["zip"],
+                country=order_data["billing_address"]["country"],
+            ),
+            shipping_method=order_data["shipping_method"],
+            gift_wrapping=order_data["gift_wrapping"],
+            terms_accepted=order_data["terms_accepted"],
+        )
+
+        response = stub.InitOrder(order_init_request)
+
+    return response
+
+
+def handle_fraud_detection(order_data):
+    """
+    Process the fraud detection for the given order data.
+    """
+    with grpc.insecure_channel("fraud_detection:50051") as channel:
+        stub = fraud_detection_grpc.FraudDetectionServiceStub(channel)
+
+        # Build the gRPC request
+        fraud_request = fraud_detection.FraudDetectionRequest(
+            order_id=order_data["order_id"],
         )
 
         response = stub.CheckFraud(fraud_request)
@@ -113,7 +215,7 @@ def handle_suggestions(user_data):
 
         # Build the gRPC request
         suggestions_request = suggestions.SuggestionsRequest(
-            user=suggestions.User(name=user_data["name"], email=user_data["email"])
+            order_id=user_data["order_id"],
         )
 
         response = stub.GetSuggestions(suggestions_request)
@@ -130,25 +232,10 @@ def handle_transaction_verification(transaction_data):
 
         # Build the gRPC request
         transaction_verification_request = (
-            transaction_verification.TransactionVerificationRequest(
-                user=transaction_verification.User(
-                    name=transaction_data["user"]["name"],
-                    email=transaction_data["user"]["email"],
-                ),
-                credit_card=transaction_verification.CreditCard(
-                    number=transaction_data["credit_card"]["number"],
-                    expiration_date=transaction_data["credit_card"]["expiration_date"],
-                    cvv=transaction_data["credit_card"]["cvv"],
-                ),
-                billing_address=transaction_verification.Address(
-                    street=transaction_data["billing_address"]["street"],
-                    city=transaction_data["billing_address"]["city"],
-                    state=transaction_data["billing_address"]["state"],
-                    zip=transaction_data["billing_address"]["zip"],
-                    country=transaction_data["billing_address"]["country"],
-                ),
+            transaction_verification.TVRequest(
+                order_id=transaction_data["order_id"],
+                )
             )
-        )
 
         response = stub.VerifyTransaction(transaction_verification_request)
 
@@ -192,6 +279,8 @@ def checkout():
         print(f"Order ID: {order_id}")
 
         order_data = {
+            "order_id": order_id,
+            "items": items,
             "user": {"name": user.get("name"), "email": user.get("contact")},
             "credit_card": {
                 "number": credit_card.get("number"),
@@ -206,15 +295,24 @@ def checkout():
                 "zip": billing_address.get("zip"),
                 "country": billing_address.get("country"),
             },
+            "shipping_method": shipping_method,
+            "gift_wrapping": gift_wrapping,
+            "terms_accepted": terms_accepted,
         }
 
+        order_id_request = {"order_id": order_id}
+
         logger.info("Received submit order request")
+
+        with futures.ThreadPoolExecutor() as executor:
+            future_init_order = executor.submit(handle_init_order, order_data)
+            init_order_result = future_init_order.result()
 
         # Concurrency executor
         with futures.ThreadPoolExecutor() as executor:
             # Dispatch the order data to the fraud detection service
             future_fraud_detection = executor.submit(
-                handle_fraud_detection, order_data
+                handle_fraud_detection, order_id_request
             )
             logger.info("Fraud Detection Service: Request sent.")
             # Wait for the results
@@ -222,7 +320,7 @@ def checkout():
 
         if fraud_detection_result.is_fraudulent:
             order_status_response = {
-                "orderId": "12345",
+                "orderId": order_id_request["order_id"],
                 "status": "Order Rejected - Fraud Detected",
                 "suggestedBooks": [],
             }
@@ -238,7 +336,7 @@ def checkout():
 
         with futures.ThreadPoolExecutor() as executor:
             future_transaction_verification = executor.submit(
-                handle_transaction_verification, order_data
+                handle_transaction_verification, order_id_request
             )
             logger.info("Transaction Verification Service: Request sent.")
             transaction_verification_result = future_transaction_verification.result()
@@ -258,7 +356,7 @@ def checkout():
         # Begin suggestions workflow
         with futures.ThreadPoolExecutor() as executor:
             future_suggestions = executor.submit(
-                handle_suggestions, order_data
+                handle_suggestions, order_id_request
             )
             logger.info("Suggestions Service: Request sent.")
             suggestions_result = future_suggestions.result()
