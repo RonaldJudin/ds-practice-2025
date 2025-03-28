@@ -8,10 +8,12 @@ service SuggestionsService {
 
 message SuggestionsRequest {
     User user = 1;
+    VectorClock vector_clock = 2;
 }
 
 message SuggestionsResponse {
     repeated Book suggested_books = 1;
+    VectorClock vector_clock = 2;
 }
 
 message User {
@@ -23,4 +25,8 @@ message Book {
     string bookId = 1;
     string title = 2;
     string author = 3;
+}
+
+message VectorClock {
+    map<string, int32> clock = 1;
 }

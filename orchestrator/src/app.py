@@ -21,9 +21,12 @@ suggestions_grpc_path = os.path.abspath(
 transaction_verification_grpc_path = os.path.abspath(
     os.path.join(FILE, "../../../utils/pb/transaction_verification")
 )
+utils_path = os.path.abspath(os.path.join(FILE, "../../../utils"))
 sys.path.insert(0, fraud_detection_grpc_path)
 sys.path.insert(0, suggestions_grpc_path)
 sys.path.insert(0, transaction_verification_grpc_path)
+sys.path.insert(0, utils_path)
+print(utils_path)
 import fraud_detection_pb2 as fraud_detection
 import fraud_detection_pb2_grpc as fraud_detection_grpc
 import suggestions_pb2 as suggestions
@@ -31,6 +34,49 @@ import suggestions_pb2_grpc as suggestions_grpc
 import transaction_verification_pb2 as transaction_verification
 import transaction_verification_pb2_grpc as transaction_verification_grpc
 import grpc
+
+# Import Vector Clock
+from collections import Counter
+
+class VectorClock:
+    def __init__(self):
+        self.clock = Counter()
+
+    def increment(self, process_id):
+        """Increment the vector clock for a specific process."""
+        self.clock[process_id] += 1
+
+    def merge(self, other_clock):
+        """Merge another vector clock into this one."""
+        for process, timestamp in other_clock.items():
+            self.clock[process] = max(self.clock[process], timestamp)
+
+    def compare(self, other_clock):
+        """Compare this vector clock with another."""
+        less, greater = False, False
+        for process in set(self.clock.keys()).union(other_clock.keys()):
+            local_time = self.clock.get(process, 0)
+            remote_time = other_clock.get(process, 0)
+            if local_time < remote_time:
+                less = True
+            elif local_time > remote_time:
+                greater = True
+        if less and greater:
+            return "CONCURRENT"  # Neither clock happened before the other
+        elif less:
+            return "BEFORE"  # This clock happened before the other
+        elif greater:
+            return "AFTER"  # This clock happened after the other
+        else:
+            return "EQUAL"  # The clocks are identical
+
+    def to_dict(self):
+        """Return a dictionary representation of the vector clock."""
+        return dict(self.clock)
+
+    def from_dict(self, clock_dict):
+        """Load vector clock from a dictionary."""
+        self.clock = Counter(clock_dict)
 
 
 def greet(name="you"):
@@ -72,7 +118,7 @@ def index():
     return response
 
 
-def handle_fraud_detection(order_data):
+def handle_fraud_detection(order_data, vector_clock):
     """
     Process the fraud detection for the given order data.
     """
@@ -97,6 +143,7 @@ def handle_fraud_detection(order_data):
                 zip=order_data["billing_address"]["zip"],
                 country=order_data["billing_address"]["country"],
             ),
+            vector_clock=vector_clock.to_dict(),
         )
 
         response = stub.CheckFraud(fraud_request)
@@ -104,7 +151,7 @@ def handle_fraud_detection(order_data):
     return response
 
 
-def handle_suggestions(user_data):
+def handle_suggestions(user_data, vector_clock):
     """
     Process the suggestions for the given user data.
     """
@@ -113,7 +160,8 @@ def handle_suggestions(user_data):
 
         # Build the gRPC request
         suggestions_request = suggestions.SuggestionsRequest(
-            user=suggestions.User(name=user_data["name"], email=user_data["email"])
+            user=suggestions.User(name=user_data["name"], email=user_data["email"]),
+            vector_clock=vector_clock.to_dict(),
         )
 
         response = stub.GetSuggestions(suggestions_request)
@@ -121,7 +169,7 @@ def handle_suggestions(user_data):
     return response
 
 
-def handle_transaction_verification(transaction_data):
+def handle_transaction_verification(transaction_data, vector_clock):
     """
     Process the transaction verification for the given transaction data.
     """
@@ -147,7 +195,8 @@ def handle_transaction_verification(transaction_data):
                     zip=transaction_data["billing_address"]["zip"],
                     country=transaction_data["billing_address"]["country"],
                 ),
-            )
+                vector_clock=vector_clock.to_dict(),
+            ),
         )
 
         response = stub.VerifyTransaction(transaction_verification_request)
@@ -210,15 +259,25 @@ def checkout():
 
         logger.info("Received submit order request")
 
+        # Vector Clock initialization
+        vector_clocks = {}
+        vector_clocks[order_id] = VectorClock()
+        vector_clocks[order_id].increment("orchestrator")
+        logger.info(f"Initialized vector clock for order {order_id}: {vector_clocks[order_id]}")
+
         # Concurrency executor
         with futures.ThreadPoolExecutor() as executor:
             # Dispatch the order data to the fraud detection service
             future_fraud_detection = executor.submit(
-                handle_fraud_detection, order_data
+                handle_fraud_detection, order_data, vector_clocks[order_id]
             )
             logger.info("Fraud Detection Service: Request sent.")
             # Wait for the results
             fraud_detection_result = future_fraud_detection.result()
+
+        # Merge returned vector clock w/ orchestrator's source of truth
+        vector_clocks[order_id].merge(fraud_detection_result.vector_clock)
+        vector_clocks.increment("orchestrator")
 
         if fraud_detection_result.is_fraudulent:
             order_status_response = {
@@ -243,6 +302,10 @@ def checkout():
             logger.info("Transaction Verification Service: Request sent.")
             transaction_verification_result = future_transaction_verification.result()
 
+        # Merge returned vector clock w/ orchestrator's source of truth
+        vector_clocks[order_id].merge(transaction_verification_result.vector_clock)
+        vector_clocks.increment("orchestrator")
+
         if not transaction_verification_result.is_verified:
             order_status_response = {
                 "orderId": "12345",
@@ -263,6 +326,11 @@ def checkout():
             logger.info("Suggestions Service: Request sent.")
             suggestions_result = future_suggestions.result()
         logger.info("Suggestions Service: Recieved suggestions.")
+
+        # Merge returned vector clock w/ orchestrator's source of truth
+        vector_clocks[order_id].merge(suggestions_result.vector_clock)
+        vector_clocks.increment("orchestrator")
+
         suggested_books = [
             {"bookId": book.bookId, "title": book.title, "author": book.author}
             for book in suggestions_result.suggested_books
@@ -270,7 +338,7 @@ def checkout():
 
         # Dummy response following the provided YAML specification for the bookstore
         order_status_response = {
-            "orderId": "12345",
+            "orderId": order_id,
             "status": "Order Approved",
             "suggestedBooks": suggested_books,
         }

@@ -14,13 +14,15 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x15\x66raud_detection.proto\x12\x0f\x66raud_detection\"\x1c\n\x0cHelloRequest\x12\x0c\n\x04name\x18\x01 \x01(\t\"!\n\rHelloResponse\x12\x10\n\x08greeting\x18\x01 \x01(\t\"\x85\x01\n\x15\x46raudDetectionRequest\x12#\n\x04user\x18\x01 \x01(\x0b\x32\x15.fraud_detection.User\x12\x14\n\x0cuser_comment\x18\x02 \x01(\t\x12\x31\n\x0f\x62illing_address\x18\x03 \x01(\x0b\x32\x18.fraud_detection.Address\"/\n\x16\x46raudDetectionResponse\x12\x15\n\ris_fraudulent\x18\x01 \x01(\x08\"E\n\x11\x43reditCardRequest\x12\x30\n\x0b\x63redit_card\x18\x01 \x01(\x0b\x32\x1b.fraud_detection.CreditCard\"+\n\x12\x43reditCardResponse\x12\x15\n\ris_fraudulent\x18\x01 \x01(\x08\"#\n\x04User\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\r\n\x05\x65mail\x18\x02 \x01(\t\"B\n\nCreditCard\x12\x0e\n\x06number\x18\x01 \x01(\t\x12\x17\n\x0f\x65xpiration_date\x18\x02 \x01(\t\x12\x0b\n\x03\x63vv\x18\x03 \x01(\t\"T\n\x07\x41\x64\x64ress\x12\x0e\n\x06street\x18\x01 \x01(\t\x12\x0c\n\x04\x63ity\x18\x02 \x01(\t\x12\r\n\x05state\x18\x03 \x01(\t\x12\x0b\n\x03zip\x18\x04 \x01(\t\x12\x0f\n\x07\x63ountry\x18\x05 \x01(\t2Y\n\x0cHelloService\x12I\n\x08SayHello\x12\x1d.fraud_detection.HelloRequest\x1a\x1e.fraud_detection.HelloResponse2\xd2\x01\n\x15\x46raudDetectionService\x12]\n\nCheckFraud\x12&.fraud_detection.FraudDetectionRequest\x1a\'.fraud_detection.FraudDetectionResponse\x12Z\n\x0f\x43heckCreditCard\x12\".fraud_detection.CreditCardRequest\x1a#.fraud_detection.CreditCardResponseb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x15\x66raud_detection.proto\x12\x0f\x66raud_detection\"\x1c\n\x0cHelloRequest\x12\x0c\n\x04name\x18\x01 \x01(\t\"!\n\rHelloResponse\x12\x10\n\x08greeting\x18\x01 \x01(\t\"\x85\x01\n\x15\x46raudDetectionRequest\x12#\n\x04user\x18\x01 \x01(\x0b\x32\x15.fraud_detection.User\x12\x14\n\x0cuser_comment\x18\x02 \x01(\t\x12\x31\n\x0f\x62illing_address\x18\x03 \x01(\x0b\x32\x18.fraud_detection.Address\"/\n\x16\x46raudDetectionResponse\x12\x15\n\ris_fraudulent\x18\x01 \x01(\x08\"y\n\x11\x43reditCardRequest\x12\x30\n\x0b\x63redit_card\x18\x01 \x01(\x0b\x32\x1b.fraud_detection.CreditCard\x12\x32\n\x0cvector_clock\x18\x02 \x01(\x0b\x32\x1c.fraud_detection.VectorClock\"_\n\x12\x43reditCardResponse\x12\x15\n\ris_fraudulent\x18\x01 \x01(\x08\x12\x32\n\x0cvector_clock\x18\x02 \x01(\x0b\x32\x1c.fraud_detection.VectorClock\"#\n\x04User\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\r\n\x05\x65mail\x18\x02 \x01(\t\"B\n\nCreditCard\x12\x0e\n\x06number\x18\x01 \x01(\t\x12\x17\n\x0f\x65xpiration_date\x18\x02 \x01(\t\x12\x0b\n\x03\x63vv\x18\x03 \x01(\t\"T\n\x07\x41\x64\x64ress\x12\x0e\n\x06street\x18\x01 \x01(\t\x12\x0c\n\x04\x63ity\x18\x02 \x01(\t\x12\r\n\x05state\x18\x03 \x01(\t\x12\x0b\n\x03zip\x18\x04 \x01(\t\x12\x0f\n\x07\x63ountry\x18\x05 \x01(\t\"s\n\x0bVectorClock\x12\x36\n\x05\x63lock\x18\x01 \x03(\x0b\x32\'.fraud_detection.VectorClock.ClockEntry\x1a,\n\nClockEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\x05:\x02\x38\x01\x32Y\n\x0cHelloService\x12I\n\x08SayHello\x12\x1d.fraud_detection.HelloRequest\x1a\x1e.fraud_detection.HelloResponse2\xd2\x01\n\x15\x46raudDetectionService\x12]\n\nCheckFraud\x12&.fraud_detection.FraudDetectionRequest\x1a\'.fraud_detection.FraudDetectionResponse\x12Z\n\x0f\x43heckCreditCard\x12\".fraud_detection.CreditCardRequest\x1a#.fraud_detection.CreditCardResponseb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
 _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'fraud_detection_pb2', _globals)
 if _descriptor._USE_C_DESCRIPTORS == False:
   DESCRIPTOR._options = None
+  _globals['_VECTORCLOCK_CLOCKENTRY']._options = None
+  _globals['_VECTORCLOCK_CLOCKENTRY']._serialized_options = b'8\001'
   _globals['_HELLOREQUEST']._serialized_start=42
   _globals['_HELLOREQUEST']._serialized_end=70
   _globals['_HELLORESPONSE']._serialized_start=72
@@ -30,17 +32,21 @@ if _descriptor._USE_C_DESCRIPTORS == False:
   _globals['_FRAUDDETECTIONRESPONSE']._serialized_start=243
   _globals['_FRAUDDETECTIONRESPONSE']._serialized_end=290
   _globals['_CREDITCARDREQUEST']._serialized_start=292
-  _globals['_CREDITCARDREQUEST']._serialized_end=361
-  _globals['_CREDITCARDRESPONSE']._serialized_start=363
-  _globals['_CREDITCARDRESPONSE']._serialized_end=406
-  _globals['_USER']._serialized_start=408
-  _globals['_USER']._serialized_end=443
-  _globals['_CREDITCARD']._serialized_start=445
-  _globals['_CREDITCARD']._serialized_end=511
-  _globals['_ADDRESS']._serialized_start=513
-  _globals['_ADDRESS']._serialized_end=597
-  _globals['_HELLOSERVICE']._serialized_start=599
-  _globals['_HELLOSERVICE']._serialized_end=688
-  _globals['_FRAUDDETECTIONSERVICE']._serialized_start=691
-  _globals['_FRAUDDETECTIONSERVICE']._serialized_end=901
+  _globals['_CREDITCARDREQUEST']._serialized_end=413
+  _globals['_CREDITCARDRESPONSE']._serialized_start=415
+  _globals['_CREDITCARDRESPONSE']._serialized_end=510
+  _globals['_USER']._serialized_start=512
+  _globals['_USER']._serialized_end=547
+  _globals['_CREDITCARD']._serialized_start=549
+  _globals['_CREDITCARD']._serialized_end=615
+  _globals['_ADDRESS']._serialized_start=617
+  _globals['_ADDRESS']._serialized_end=701
+  _globals['_VECTORCLOCK']._serialized_start=703
+  _globals['_VECTORCLOCK']._serialized_end=818
+  _globals['_VECTORCLOCK_CLOCKENTRY']._serialized_start=774
+  _globals['_VECTORCLOCK_CLOCKENTRY']._serialized_end=818
+  _globals['_HELLOSERVICE']._serialized_start=820
+  _globals['_HELLOSERVICE']._serialized_end=909
+  _globals['_FRAUDDETECTIONSERVICE']._serialized_start=912
+  _globals['_FRAUDDETECTIONSERVICE']._serialized_end=1122
 # @@protoc_insertion_point(module_scope)

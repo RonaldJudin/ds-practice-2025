@@ -6,16 +6,20 @@ from typing import ClassVar as _ClassVar, Iterable as _Iterable, Mapping as _Map
 DESCRIPTOR: _descriptor.FileDescriptor
 
 class SuggestionsRequest(_message.Message):
-    __slots__ = ("user",)
+    __slots__ = ("user", "vector_clock")
     USER_FIELD_NUMBER: _ClassVar[int]
+    VECTOR_CLOCK_FIELD_NUMBER: _ClassVar[int]
     user: User
-    def __init__(self, user: _Optional[_Union[User, _Mapping]] = ...) -> None: ...
+    vector_clock: VectorClock
+    def __init__(self, user: _Optional[_Union[User, _Mapping]] = ..., vector_clock: _Optional[_Union[VectorClock, _Mapping]] = ...) -> None: ...
 
 class SuggestionsResponse(_message.Message):
-    __slots__ = ("suggested_books",)
+    __slots__ = ("suggested_books", "vector_clock")
     SUGGESTED_BOOKS_FIELD_NUMBER: _ClassVar[int]
+    VECTOR_CLOCK_FIELD_NUMBER: _ClassVar[int]
     suggested_books: _containers.RepeatedCompositeFieldContainer[Book]
-    def __init__(self, suggested_books: _Optional[_Iterable[_Union[Book, _Mapping]]] = ...) -> None: ...
+    vector_clock: VectorClock
+    def __init__(self, suggested_books: _Optional[_Iterable[_Union[Book, _Mapping]]] = ..., vector_clock: _Optional[_Union[VectorClock, _Mapping]] = ...) -> None: ...
 
 class User(_message.Message):
     __slots__ = ("name", "email")
@@ -34,3 +38,16 @@ class Book(_message.Message):
     title: str
     author: str
     def __init__(self, bookId: _Optional[str] = ..., title: _Optional[str] = ..., author: _Optional[str] = ...) -> None: ...
+
+class VectorClock(_message.Message):
+    __slots__ = ("clock",)
+    class ClockEntry(_message.Message):
+        __slots__ = ("key", "value")
+        KEY_FIELD_NUMBER: _ClassVar[int]
+        VALUE_FIELD_NUMBER: _ClassVar[int]
+        key: str
+        value: int
+        def __init__(self, key: _Optional[str] = ..., value: _Optional[int] = ...) -> None: ...
+    CLOCK_FIELD_NUMBER: _ClassVar[int]
+    clock: _containers.ScalarMap[str, int]
+    def __init__(self, clock: _Optional[_Mapping[str, int]] = ...) -> None: ...

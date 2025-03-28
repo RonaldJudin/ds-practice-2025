@@ -1,3 +1,4 @@
+from google.protobuf.internal import containers as _containers
 from google.protobuf import descriptor as _descriptor
 from google.protobuf import message as _message
 from typing import ClassVar as _ClassVar, Mapping as _Mapping, Optional as _Optional, Union as _Union
@@ -33,16 +34,20 @@ class FraudDetectionResponse(_message.Message):
     def __init__(self, is_fraudulent: bool = ...) -> None: ...
 
 class CreditCardRequest(_message.Message):
-    __slots__ = ("credit_card",)
+    __slots__ = ("credit_card", "vector_clock")
     CREDIT_CARD_FIELD_NUMBER: _ClassVar[int]
+    VECTOR_CLOCK_FIELD_NUMBER: _ClassVar[int]
     credit_card: CreditCard
-    def __init__(self, credit_card: _Optional[_Union[CreditCard, _Mapping]] = ...) -> None: ...
+    vector_clock: VectorClock
+    def __init__(self, credit_card: _Optional[_Union[CreditCard, _Mapping]] = ..., vector_clock: _Optional[_Union[VectorClock, _Mapping]] = ...) -> None: ...
 
 class CreditCardResponse(_message.Message):
-    __slots__ = ("is_fraudulent",)
+    __slots__ = ("is_fraudulent", "vector_clock")
     IS_FRAUDULENT_FIELD_NUMBER: _ClassVar[int]
+    VECTOR_CLOCK_FIELD_NUMBER: _ClassVar[int]
     is_fraudulent: bool
-    def __init__(self, is_fraudulent: bool = ...) -> None: ...
+    vector_clock: VectorClock
+    def __init__(self, is_fraudulent: bool = ..., vector_clock: _Optional[_Union[VectorClock, _Mapping]] = ...) -> None: ...
 
 class User(_message.Message):
     __slots__ = ("name", "email")
@@ -75,3 +80,16 @@ class Address(_message.Message):
     zip: str
     country: str
     def __init__(self, street: _Optional[str] = ..., city: _Optional[str] = ..., state: _Optional[str] = ..., zip: _Optional[str] = ..., country: _Optional[str] = ...) -> None: ...
+
+class VectorClock(_message.Message):
+    __slots__ = ("clock",)
+    class ClockEntry(_message.Message):
+        __slots__ = ("key", "value")
+        KEY_FIELD_NUMBER: _ClassVar[int]
+        VALUE_FIELD_NUMBER: _ClassVar[int]
+        key: str
+        value: int
+        def __init__(self, key: _Optional[str] = ..., value: _Optional[int] = ...) -> None: ...
+    CLOCK_FIELD_NUMBER: _ClassVar[int]
+    clock: _containers.ScalarMap[str, int]
+    def __init__(self, clock: _Optional[_Mapping[str, int]] = ...) -> None: ...
