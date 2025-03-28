@@ -88,11 +88,11 @@ class FraudDetectionService(fraud_detection_grpc.FraudDetectionServiceServicer):
         """
         logger.info("Fraud Detection Service: Credit card validation request received.")
         # Extract credit card data from the request
-        credit_card_data = self.orders[request.order_id]["credit_card"],
+        credit_card_data = self.orders[request.order_id]["credit_card"]
 
         # Verify credit card if its number starts with 372
         is_verified = False
-        if credit_card_data["number"].startswith("372"):
+        if credit_card_data.number.startswith("372"):
             is_verified = True
 
         # Create a CreditCardResponse object

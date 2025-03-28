@@ -71,7 +71,7 @@ def index():
     # Return the response.
     return response
 
-def handle_init_order(order_data):
+def handle_init_order_fraud_detection(order_data):
     """
     Process the order initialization for the given order data.
     """
@@ -111,7 +111,12 @@ def handle_init_order(order_data):
         )
 
         response = stub.InitOrder(order_init_request)
+    return response
 
+def handle_init_order_suggestions(order_data):
+    """
+    Process the order initialization for the given order data.
+    """
     with grpc.insecure_channel("suggestions:50052") as channel:
         logger.info("Suggestions Service: Order initialization request sent.")
         stub = suggestions_grpc.SuggestionsServiceStub(channel)
@@ -148,7 +153,12 @@ def handle_init_order(order_data):
         )
 
         response = stub.InitOrder(order_init_request)
-    
+    return response
+
+def handle_init_order_transaction_verification(order_data):
+    """
+    Process the order initialization for the given order data.
+    """
     with grpc.insecure_channel("transaction_verification:50053") as channel:
         logger.info("Transaction Verification Service: Order initialization request sent.")
         stub = transaction_verification_grpc.TransactionVerificationServiceStub(channel)
@@ -185,9 +195,7 @@ def handle_init_order(order_data):
         )
 
         response = stub.InitOrder(order_init_request)
-
     return response
-
 
 def handle_fraud_detection(order_data):
     """
@@ -205,6 +213,21 @@ def handle_fraud_detection(order_data):
 
     return response
 
+def handle_fraud_detection_cc(order_data):
+    """
+    Process the fraud detection for the given order data.
+    """
+    with grpc.insecure_channel("fraud_detection:50051") as channel:
+        stub = fraud_detection_grpc.FraudDetectionServiceStub(channel)
+
+        # Build the gRPC request
+        fraud_request = fraud_detection.FraudDetectionRequest(
+            order_id=order_data["order_id"],
+        )
+
+        response = stub.CheckCreditCard(fraud_request)
+
+    return response
 
 def handle_suggestions(user_data):
     """
@@ -223,6 +246,60 @@ def handle_suggestions(user_data):
     return response
 
 
+def handle_transaction_verification_a(transaction_data):
+    """
+    Process the transaction verification for the given transaction data.
+    """
+    with grpc.insecure_channel("transaction_verification:50053") as channel:
+        stub = transaction_verification_grpc.TransactionVerificationServiceStub(channel)
+
+        # Build the gRPC request
+        transaction_verification_request = (
+            transaction_verification.TVRequest(
+                order_id=transaction_data["order_id"],
+                )
+            )
+
+        response = stub.VerifyBookList(transaction_verification_request)
+
+    return response
+
+def handle_transaction_verification_b(transaction_data):
+    """
+    Process the transaction verification for the given transaction data.
+    """
+    with grpc.insecure_channel("transaction_verification:50053") as channel:
+        stub = transaction_verification_grpc.TransactionVerificationServiceStub(channel)
+
+        # Build the gRPC request
+        transaction_verification_request = (
+            transaction_verification.TVRequest(
+                order_id=transaction_data["order_id"],
+                )
+            )
+
+        response = stub.VerifyUserData(transaction_verification_request)
+
+    return response
+
+def handle_transaction_verification_c(transaction_data):
+    """
+    Process the transaction verification for the given transaction data.
+    """
+    with grpc.insecure_channel("transaction_verification:50053") as channel:
+        stub = transaction_verification_grpc.TransactionVerificationServiceStub(channel)
+
+        # Build the gRPC request
+        transaction_verification_request = (
+            transaction_verification.TVRequest(
+                order_id=transaction_data["order_id"],
+                )
+            )
+
+        response = stub.VerifyCreditCardFormat(transaction_verification_request)
+
+    return response
+
 def handle_transaction_verification(transaction_data):
     """
     Process the transaction verification for the given transaction data.
@@ -240,7 +317,6 @@ def handle_transaction_verification(transaction_data):
         response = stub.VerifyTransaction(transaction_verification_request)
 
     return response
-
 
 @app.route("/checkout", methods=["POST"])
 def checkout():
@@ -304,21 +380,68 @@ def checkout():
 
         logger.info("Received submit order request")
 
-        with futures.ThreadPoolExecutor() as executor:
-            future_init_order = executor.submit(handle_init_order, order_data)
-            init_order_result = future_init_order.result()
+        # Initialise the executor
+        executor = futures.ThreadPoolExecutor(max_workers=3)
 
-        # Concurrency executor
-        with futures.ThreadPoolExecutor() as executor:
-            # Dispatch the order data to the fraud detection service
-            future_fraud_detection = executor.submit(
-                handle_fraud_detection, order_id_request
+        # Initialise the order in the microservices
+        fraud_detection_init_order = executor.submit(handle_init_order_fraud_detection, order_data)
+        suggestions_init_order = executor.submit(handle_init_order_suggestions, order_data)
+        transaction_verification_init_order = executor.submit(handle_init_order_transaction_verification, order_data)
+        print(fraud_detection_init_order.result(), suggestions_init_order.result(), transaction_verification_init_order.result())
+
+        # Events a and b: check if the book list is nonempty and if the user data is complete
+        future_tv_booklist = executor.submit(
+            handle_transaction_verification_a, order_id_request
             )
-            logger.info("Fraud Detection Service: Request sent.")
-            # Wait for the results
-            fraud_detection_result = future_fraud_detection.result()
+        future_tv_userdata = executor.submit(
+            handle_transaction_verification_b, order_id_request
+            )
+        
+        # Events a and b: wait for the results of the book list and user data verification
+        if not future_tv_booklist.result().is_verified:
+            order_status_response = {
+                "orderId": order_id_request["order_id"],
+                "status": "Order Rejected - Nothing Ordered",
+                "suggestedBooks": [],
+            }
+            logger.info(
+                "Transaction Verification Service: No books ordered. Rejecting order."
+            )
+            return json.dumps(order_status_response), 200
+        
+        if not future_tv_userdata.result().is_verified:
+            order_status_response = {
+                "orderId": order_id_request["order_id"],
+                "status": "Order Rejected - User Data Incomplete",
+                "suggestedBooks": [],
+            }
+            logger.info(
+                "Transaction Verification Service: User data incomplete. Rejecting order."
+            )
+            return json.dumps(order_status_response), 200
 
-        if fraud_detection_result.is_fraudulent:
+        # Events c and d: check credit card format and fraud detecion for user data
+        future_tv_cc = executor.submit(
+            handle_transaction_verification_c, order_id_request
+            )
+        future_fraud_detection = executor.submit(
+            handle_fraud_detection, order_id_request
+            )
+        logger.info("Fraud Detection Service: Request sent.")
+
+        # Events c and d: wait for the results of credit card verification and user fraud detection
+        if not future_tv_cc.result().is_verified:
+            order_status_response = {
+                "orderId": order_id_request["order_id"],
+                "status": "Order Rejected - Bad Credit Card",
+                "suggestedBooks": [],
+            }
+            logger.info(
+                "Transaction Verification Service: Credit card data bad. Rejecting order."
+            )
+            return json.dumps(order_status_response), 200
+
+        if future_fraud_detection.result().is_fraudulent:
             order_status_response = {
                 "orderId": order_id_request["order_id"],
                 "status": "Order Rejected - Fraud Detected",
@@ -331,20 +454,33 @@ def checkout():
             return json.dumps(order_status_response), 200
         logger.info("Fraud Detection Service: Passed fraud check.")
 
-        # No fraud detected, continue
-        # Begin transaction verification workflow
+        # Events k and e: ask Kanye and check credit card validity
+        future_transaction_verification = executor.submit(
+            handle_transaction_verification, order_id_request
+        )
+        future_fd_cc = executor.submit(
+            handle_fraud_detection_cc, order_id_request
+        )
+        logger.info("Transaction Verification Service: Request sent.")
 
-        with futures.ThreadPoolExecutor() as executor:
-            future_transaction_verification = executor.submit(
-                handle_transaction_verification, order_id_request
+        # Events k and e: wait for Kanye's answer and credit card validation results
+        if not future_fd_cc.result().is_verified:
+            order_status_response = {
+                "orderId": order_id_request["order_id"],
+                "status": "Order Rejected - Credit Card Verification Failed",
+                "suggestedBooks": [],
+            }
+
+            logger.info(
+                "Fraud Detection Service: Credit Card doesn't work. Rejecting order."
             )
-            logger.info("Transaction Verification Service: Request sent.")
-            transaction_verification_result = future_transaction_verification.result()
+            return json.dumps(order_status_response), 200
+        transaction_verification_result = future_transaction_verification.result()
 
         if not transaction_verification_result.is_verified:
             order_status_response = {
-                "orderId": "12345",
-                "status": "Order Rejected - Transaction Verification Failed",
+                "orderId": order_id_request["order_id"],
+                "status": "Order Rejected - Kanye Said No",
                 "suggestedBooks": [],
             }
             logger.info(
@@ -353,22 +489,21 @@ def checkout():
             return json.dumps(order_status_response), 200
         logger.info("Transaction Verification Service: Transaction verified.")
 
-        # Begin suggestions workflow
-        with futures.ThreadPoolExecutor() as executor:
-            future_suggestions = executor.submit(
-                handle_suggestions, order_id_request
-            )
-            logger.info("Suggestions Service: Request sent.")
-            suggestions_result = future_suggestions.result()
+        # Event f: ask OpenLibrary for book suggestions
+        future_suggestions = executor.submit(
+            handle_suggestions, order_id_request
+        )
+        logger.info("Suggestions Service: Request sent.")
+        suggestions_result = future_suggestions.result()
         logger.info("Suggestions Service: Recieved suggestions.")
         suggested_books = [
             {"bookId": book.bookId, "title": book.title, "author": book.author}
             for book in suggestions_result.suggested_books
         ]
 
-        # Dummy response following the provided YAML specification for the bookstore
+        # Final response with books following the provided YAML specification for the bookstore
         order_status_response = {
-            "orderId": "12345",
+            "orderId": order_id_request["order_id"],
             "status": "Order Approved",
             "suggestedBooks": suggested_books,
         }
