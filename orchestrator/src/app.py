@@ -197,22 +197,6 @@ def handle_init_order_transaction_verification(order_data):
         response = stub.InitOrder(order_init_request)
     return response
 
-def handle_fraud_detection(order_data):
-    """
-    Process the fraud detection for the given order data.
-    """
-    with grpc.insecure_channel("fraud_detection:50051") as channel:
-        stub = fraud_detection_grpc.FraudDetectionServiceStub(channel)
-
-        # Build the gRPC request
-        fraud_request = fraud_detection.FraudDetectionRequest(
-            order_id=order_data["order_id"],
-        )
-
-        response = stub.CheckFraud(fraud_request)
-
-    return response
-
 def handle_fraud_detection_cc(order_data):
     """
     Process the fraud detection for the given order data.
@@ -279,24 +263,6 @@ def handle_transaction_verification_b(transaction_data):
             )
 
         response = stub.VerifyUserData(transaction_verification_request)
-
-    return response
-
-def handle_transaction_verification_c(transaction_data):
-    """
-    Process the transaction verification for the given transaction data.
-    """
-    with grpc.insecure_channel("transaction_verification:50053") as channel:
-        stub = transaction_verification_grpc.TransactionVerificationServiceStub(channel)
-
-        # Build the gRPC request
-        transaction_verification_request = (
-            transaction_verification.TVRequest(
-                order_id=transaction_data["order_id"],
-                )
-            )
-
-        response = stub.VerifyCreditCardFormat(transaction_verification_request)
 
     return response
 
@@ -392,68 +358,34 @@ def checkout():
         # Events a and b: check if the book list is nonempty and if the user data is complete
         future_tv_booklist = executor.submit(
             handle_transaction_verification_a, order_id_request
-            )
+            ) # Event c is also called inside
         future_tv_userdata = executor.submit(
             handle_transaction_verification_b, order_id_request
-            )
+            ) # Event d is also called inside
         
-        # Events a and b: wait for the results of the book list and user data verification
+        # Events a, b, c and d: wait for the results of the book list and user data verification
         if not future_tv_booklist.result().is_verified:
             order_status_response = {
                 "orderId": order_id_request["order_id"],
-                "status": "Order Rejected - Nothing Ordered",
+                "status": "Order Rejected - Nothing Ordered or Bad Credit Card Format",
                 "suggestedBooks": [],
             }
             logger.info(
-                "Transaction Verification Service: No books ordered. Rejecting order."
+                "Transaction Verification Service: No books ordered or credit card data in wrong format. Rejecting order."
             )
             return json.dumps(order_status_response), 200
         
         if not future_tv_userdata.result().is_verified:
             order_status_response = {
                 "orderId": order_id_request["order_id"],
-                "status": "Order Rejected - User Data Incomplete",
+                "status": "Order Rejected - User Data Incomplete or Fraud Detected",
                 "suggestedBooks": [],
             }
             logger.info(
-                "Transaction Verification Service: User data incomplete. Rejecting order."
+                "Transaction Verification Service: User data incomplete or fraud detected. Rejecting order."
             )
             return json.dumps(order_status_response), 200
-
-        # Events c and d: check credit card format and fraud detecion for user data
-        future_tv_cc = executor.submit(
-            handle_transaction_verification_c, order_id_request
-            )
-        future_fraud_detection = executor.submit(
-            handle_fraud_detection, order_id_request
-            )
-        logger.info("Fraud Detection Service: Request sent.")
-
-        # Events c and d: wait for the results of credit card verification and user fraud detection
-        if not future_tv_cc.result().is_verified:
-            order_status_response = {
-                "orderId": order_id_request["order_id"],
-                "status": "Order Rejected - Bad Credit Card",
-                "suggestedBooks": [],
-            }
-            logger.info(
-                "Transaction Verification Service: Credit card data bad. Rejecting order."
-            )
-            return json.dumps(order_status_response), 200
-
-        if future_fraud_detection.result().is_fraudulent:
-            order_status_response = {
-                "orderId": order_id_request["order_id"],
-                "status": "Order Rejected - Fraud Detected",
-                "suggestedBooks": [],
-            }
-
-            logger.info(
-                "Fraud Detection Service: User in FBI wanted database. Rejecting order."
-            )
-            return json.dumps(order_status_response), 200
-        logger.info("Fraud Detection Service: Passed fraud check.")
-
+        
         # Events k and e: ask Kanye and check credit card validity
         future_transaction_verification = executor.submit(
             handle_transaction_verification, order_id_request

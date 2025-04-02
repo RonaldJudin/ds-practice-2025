@@ -14,9 +14,15 @@ FILE = __file__ if "__file__" in globals() else os.getenv("PYTHONFILE", "")
 transaction_verification_grpc_path = os.path.abspath(
     os.path.join(FILE, "../../../utils/pb/transaction_verification")
 )
+fraud_detection_grpc_path = os.path.abspath(
+    os.path.join(FILE, "../../../utils/pb/fraud_detection")
+)
 sys.path.insert(0, transaction_verification_grpc_path)
+sys.path.insert(0, fraud_detection_grpc_path)
 import transaction_verification_pb2 as transaction_verification
 import transaction_verification_pb2_grpc as transaction_verification_grpc
+import fraud_detection_pb2 as fraud_detection
+import fraud_detection_pb2_grpc as fraud_detection_grpc
 
 import grpc
 from concurrent import futures
@@ -38,6 +44,22 @@ def analyze_sentiment(quote):
     # Polarity ranges from -1 to 1
     sentiment_score = blob.sentiment.polarity
     return sentiment_score > -0.2
+
+def handle_fraud_detection(order_id):
+    """
+    Process the fraud detection for the given order data.
+    """
+    with grpc.insecure_channel("fraud_detection:50051") as channel:
+        stub = fraud_detection_grpc.FraudDetectionServiceStub(channel)
+
+        # Build the gRPC request
+        fraud_request = fraud_detection.FraudDetectionRequest(
+            order_id=order_id,
+        )
+
+        response = stub.CheckFraud(fraud_request)
+
+    return response
 
 
 class TransactionVerificationService(
@@ -80,6 +102,7 @@ class TransactionVerificationService(
     
     def VerifyBookList(self, request, context):
         # Extract the book list from the request
+        logger.info("Transaction Verification Service: Book list verification request received.")
         book_list = self.orders[request.order_id]["items"]
         # Create a CheckBookListResponse object
         response = transaction_verification.VerifyBookListResponse()
@@ -87,17 +110,28 @@ class TransactionVerificationService(
         response.is_verified = False
         if book_list:
             response.is_verified = True
+            logger.info("Transaction Verification Service: Book list verified. Proceeding to user data verification.")
+            # Proceed to verify user data
+            return self.VerifyCreditCardFormat(request, context)
+        logger.info("Transaction Verification Service: Book list is empty. Order not verified.")
         return response
     
     def VerifyUserData(self, request, context):
+        logger.info("Transaction Verification Service: User data verification request received.")
         # Extract user data from the request
-        logger.info(self.orders)
         user_data = self.orders[request.order_id]["user"]
         billing_address = self.orders[request.order_id]["billing_address"]
         credit_card = self.orders[request.order_id]["credit_card"]
         # Check that no fields in these data are empty
         response = transaction_verification.VerifyUserDataResponse()
         response.is_verified = True if user_data.name and user_data.email and billing_address.street and billing_address.city and billing_address.state and billing_address.zip and billing_address.country and credit_card.number and credit_card.expiration_date and credit_card.cvv else False
+        if response.is_verified:
+            logger.info("Transaction Verification Service: User data verified. Proceeding to fraud detection.")
+            fraud_response = handle_fraud_detection(request.order_id)
+            if fraud_response.is_fraudulent:
+                response.is_verified = False
+            return response
+        logger.info("Transaction Verification Service: User data not verified. Rejecting order.")
         return response
     
     def VerifyCreditCardFormat(self, request, context):
@@ -106,6 +140,10 @@ class TransactionVerificationService(
         # Check if the credit card number is 16 digits, expiration date is in MM/YY format, and CVV is 3 digits
         response = transaction_verification.VerifyCreditCardFormatResponse()
         response.is_verified = len(credit_card_data.number) == 16 and len(credit_card_data.expiration_date) == 5 and len(credit_card_data.cvv) == 3
+        if response.is_verified:
+            logger.info("Transaction Verification Service: Credit card format verified.")
+        else:
+            logger.info("Transaction Verification Service: Credit card format wrong. Rejecting order.")
         return response
     
     def VerifyTransaction(self, request, context):
@@ -131,7 +169,7 @@ class TransactionVerificationService(
             - Logs if Kanye West approves or refuses the transaction based on sentiment analysis.
             - Logs the sending of the response.
         """
-        logger.info("Transaction Verification Service: Request received.")
+        logger.info("Transaction Verification Service: Kanye requested.")
 
         # Create a TransactionVerificationResponse object
         response = transaction_verification.TransactionVerificationResponse()
@@ -158,7 +196,6 @@ class TransactionVerificationService(
         logger.info(
             "Transaction Verification Service: Kanye West refused the transaction."
         )
-        logger.info("Transaction Verification Service: Response sent.")
         return response
 
 

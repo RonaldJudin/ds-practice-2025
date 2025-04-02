@@ -141,12 +141,14 @@ class FraudDetectionService(fraud_detection_grpc.FraudDetectionServiceServicer):
         is_fraudulent = False
         if wanted_data["total"] > 0:
             is_fraudulent = True
+            logger.info("Fraud Detection Service: User is wanted. Order flagged as fraudulent.")
+        else:
+            logger.info("Fraud Detection Service: User is not wanted. Order is not flagged as fraudulent.")
 
         # Create a FraudDetectionResponse object
         response = fraud_detection.FraudDetectionResponse()
         response.is_fraudulent = is_fraudulent
         logger.info("Fraud Detection Service: Response sent.")
-
         return response
 
 
