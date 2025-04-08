@@ -21,15 +21,21 @@ suggestions_grpc_path = os.path.abspath(
 transaction_verification_grpc_path = os.path.abspath(
     os.path.join(FILE, "../../../utils/pb/transaction_verification")
 )
+order_queue_grpc_path = os.path.abspath(
+    os.path.join(FILE, "../../../utils/pb/order_queue")
+)
 sys.path.insert(0, fraud_detection_grpc_path)
 sys.path.insert(0, suggestions_grpc_path)
 sys.path.insert(0, transaction_verification_grpc_path)
+sys.path.insert(0, order_queue_grpc_path)
 import fraud_detection_pb2 as fraud_detection
 import fraud_detection_pb2_grpc as fraud_detection_grpc
 import suggestions_pb2 as suggestions
 import suggestions_pb2_grpc as suggestions_grpc
 import transaction_verification_pb2 as transaction_verification
 import transaction_verification_pb2_grpc as transaction_verification_grpc
+import order_queue_pb2 as order_queue
+import order_queue_pb2_grpc as order_queue_grpc
 import grpc
 
 
@@ -284,6 +290,22 @@ def handle_transaction_verification(transaction_data):
 
     return response
 
+def handle_order_queue(order_data):
+    """
+    Insert the order into the order queue.
+    """
+    with grpc.insecure_channel("order_queue:50054") as channel:
+        stub = order_queue_grpc.OrderQueueServiceStub(channel)
+
+        # Build the gRPC request
+        order_queue_request = order_queue.EnqueueRequest(
+            order_id=order_data["order_id"],
+        )
+
+        response = stub.Enqueue(order_queue_request)
+
+    return response
+
 @app.route("/checkout", methods=["POST"])
 def checkout():
     """
@@ -432,6 +454,12 @@ def checkout():
             {"bookId": book.bookId, "title": book.title, "author": book.author}
             for book in suggestions_result.suggested_books
         ]
+
+        # Queue the order
+        future_order_queue = executor.submit(
+            handle_order_queue, order_id_request
+        )
+        logger.info("Order Queue Service: Order queued.")
 
         # Final response with books following the provided YAML specification for the bookstore
         order_status_response = {
