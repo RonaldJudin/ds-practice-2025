@@ -1,0 +1,28 @@
+syntax = "proto3";
+
+package order_queue;
+
+service ExecutorService {
+    rpc ping (PingRequest) returns (PingResponse);
+    rpc answer (Ping) returns (PingResponse);
+    rpc new_leader (NewLeaderRequest) returns (NewLeaderResponse);
+}
+
+message PingRequest {
+    int32 address = 1;
+}
+
+message Ping {
+}
+
+message PingResponse {
+    int32 executor_id = 1;
+}
+
+message NewLeaderRequest {
+    int32 leader_id = 1;
+}
+
+message NewLeaderResponse {
+    bool acknowledged = 1;
+}

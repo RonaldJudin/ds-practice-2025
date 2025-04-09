@@ -23,7 +23,7 @@ class DequeueRequest(_message.Message):
     def __init__(self, order_id: _Optional[str] = ...) -> None: ...
 
 class DequeueResponse(_message.Message):
-    __slots__ = ("is_dequeued",)
-    IS_DEQUEUED_FIELD_NUMBER: _ClassVar[int]
-    is_dequeued: bool
-    def __init__(self, is_dequeued: bool = ...) -> None: ...
+    __slots__ = ("order_id",)
+    ORDER_ID_FIELD_NUMBER: _ClassVar[int]
+    order_id: str
+    def __init__(self, order_id: _Optional[str] = ...) -> None: ...

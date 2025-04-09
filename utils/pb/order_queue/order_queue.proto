@@ -20,5 +20,5 @@ message DequeueRequest {
 }
 
 message DequeueResponse {
-    bool is_dequeued = 1;
+    string order_id = 1;
 }
