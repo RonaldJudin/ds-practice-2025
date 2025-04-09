@@ -56,34 +56,79 @@ class TransactionVerificationRequest(_message.Message):
     def __init__(self, order_id: _Optional[str] = ..., items: _Optional[_Iterable[str]] = ..., user: _Optional[_Union[User, _Mapping]] = ..., credit_card: _Optional[_Union[CreditCard, _Mapping]] = ..., user_comment: _Optional[str] = ..., billing_address: _Optional[_Union[Address, _Mapping]] = ..., shipping_method: _Optional[str] = ..., gift_wrapping: bool = ..., terms_accepted: bool = ...) -> None: ...
 
 class TransactionVerificationResponse(_message.Message):
-    __slots__ = ("is_verified",)
+    __slots__ = ("is_verified", "vector_clock")
+    class VectorClockEntry(_message.Message):
+        __slots__ = ("key", "value")
+        KEY_FIELD_NUMBER: _ClassVar[int]
+        VALUE_FIELD_NUMBER: _ClassVar[int]
+        key: str
+        value: int
+        def __init__(self, key: _Optional[str] = ..., value: _Optional[int] = ...) -> None: ...
     IS_VERIFIED_FIELD_NUMBER: _ClassVar[int]
+    VECTOR_CLOCK_FIELD_NUMBER: _ClassVar[int]
     is_verified: bool
-    def __init__(self, is_verified: bool = ...) -> None: ...
+    vector_clock: _containers.ScalarMap[str, int]
+    def __init__(self, is_verified: bool = ..., vector_clock: _Optional[_Mapping[str, int]] = ...) -> None: ...
 
 class TVRequest(_message.Message):
-    __slots__ = ("order_id",)
+    __slots__ = ("order_id", "vector_clock")
+    class VectorClockEntry(_message.Message):
+        __slots__ = ("key", "value")
+        KEY_FIELD_NUMBER: _ClassVar[int]
+        VALUE_FIELD_NUMBER: _ClassVar[int]
+        key: str
+        value: int
+        def __init__(self, key: _Optional[str] = ..., value: _Optional[int] = ...) -> None: ...
     ORDER_ID_FIELD_NUMBER: _ClassVar[int]
+    VECTOR_CLOCK_FIELD_NUMBER: _ClassVar[int]
     order_id: str
-    def __init__(self, order_id: _Optional[str] = ...) -> None: ...
+    vector_clock: _containers.ScalarMap[str, int]
+    def __init__(self, order_id: _Optional[str] = ..., vector_clock: _Optional[_Mapping[str, int]] = ...) -> None: ...
 
 class VerifyBookListResponse(_message.Message):
-    __slots__ = ("is_verified",)
+    __slots__ = ("is_verified", "vector_clock")
+    class VectorClockEntry(_message.Message):
+        __slots__ = ("key", "value")
+        KEY_FIELD_NUMBER: _ClassVar[int]
+        VALUE_FIELD_NUMBER: _ClassVar[int]
+        key: str
+        value: int
+        def __init__(self, key: _Optional[str] = ..., value: _Optional[int] = ...) -> None: ...
     IS_VERIFIED_FIELD_NUMBER: _ClassVar[int]
+    VECTOR_CLOCK_FIELD_NUMBER: _ClassVar[int]
     is_verified: bool
-    def __init__(self, is_verified: bool = ...) -> None: ...
+    vector_clock: _containers.ScalarMap[str, int]
+    def __init__(self, is_verified: bool = ..., vector_clock: _Optional[_Mapping[str, int]] = ...) -> None: ...
 
 class VerifyUserDataResponse(_message.Message):
-    __slots__ = ("is_verified",)
+    __slots__ = ("is_verified", "vector_clock")
+    class VectorClockEntry(_message.Message):
+        __slots__ = ("key", "value")
+        KEY_FIELD_NUMBER: _ClassVar[int]
+        VALUE_FIELD_NUMBER: _ClassVar[int]
+        key: str
+        value: int
+        def __init__(self, key: _Optional[str] = ..., value: _Optional[int] = ...) -> None: ...
     IS_VERIFIED_FIELD_NUMBER: _ClassVar[int]
+    VECTOR_CLOCK_FIELD_NUMBER: _ClassVar[int]
     is_verified: bool
-    def __init__(self, is_verified: bool = ...) -> None: ...
+    vector_clock: _containers.ScalarMap[str, int]
+    def __init__(self, is_verified: bool = ..., vector_clock: _Optional[_Mapping[str, int]] = ...) -> None: ...
 
 class VerifyCreditCardFormatResponse(_message.Message):
-    __slots__ = ("is_verified",)
+    __slots__ = ("is_verified", "vector_clock")
+    class VectorClockEntry(_message.Message):
+        __slots__ = ("key", "value")
+        KEY_FIELD_NUMBER: _ClassVar[int]
+        VALUE_FIELD_NUMBER: _ClassVar[int]
+        key: str
+        value: int
+        def __init__(self, key: _Optional[str] = ..., value: _Optional[int] = ...) -> None: ...
     IS_VERIFIED_FIELD_NUMBER: _ClassVar[int]
+    VECTOR_CLOCK_FIELD_NUMBER: _ClassVar[int]
     is_verified: bool
-    def __init__(self, is_verified: bool = ...) -> None: ...
+    vector_clock: _containers.ScalarMap[str, int]
+    def __init__(self, is_verified: bool = ..., vector_clock: _Optional[_Mapping[str, int]] = ...) -> None: ...
 
 class Book(_message.Message):
     __slots__ = ("name", "quantity")

@@ -34,16 +34,34 @@ class InitOrderResponse(_message.Message):
     def __init__(self, order_id: _Optional[str] = ...) -> None: ...
 
 class SuggestionsRequest(_message.Message):
-    __slots__ = ("order_id",)
+    __slots__ = ("order_id", "vector_clock")
+    class VectorClockEntry(_message.Message):
+        __slots__ = ("key", "value")
+        KEY_FIELD_NUMBER: _ClassVar[int]
+        VALUE_FIELD_NUMBER: _ClassVar[int]
+        key: str
+        value: int
+        def __init__(self, key: _Optional[str] = ..., value: _Optional[int] = ...) -> None: ...
     ORDER_ID_FIELD_NUMBER: _ClassVar[int]
+    VECTOR_CLOCK_FIELD_NUMBER: _ClassVar[int]
     order_id: str
-    def __init__(self, order_id: _Optional[str] = ...) -> None: ...
+    vector_clock: _containers.ScalarMap[str, int]
+    def __init__(self, order_id: _Optional[str] = ..., vector_clock: _Optional[_Mapping[str, int]] = ...) -> None: ...
 
 class SuggestionsResponse(_message.Message):
-    __slots__ = ("suggested_books",)
+    __slots__ = ("suggested_books", "vector_clock")
+    class VectorClockEntry(_message.Message):
+        __slots__ = ("key", "value")
+        KEY_FIELD_NUMBER: _ClassVar[int]
+        VALUE_FIELD_NUMBER: _ClassVar[int]
+        key: str
+        value: int
+        def __init__(self, key: _Optional[str] = ..., value: _Optional[int] = ...) -> None: ...
     SUGGESTED_BOOKS_FIELD_NUMBER: _ClassVar[int]
+    VECTOR_CLOCK_FIELD_NUMBER: _ClassVar[int]
     suggested_books: _containers.RepeatedCompositeFieldContainer[Book]
-    def __init__(self, suggested_books: _Optional[_Iterable[_Union[Book, _Mapping]]] = ...) -> None: ...
+    vector_clock: _containers.ScalarMap[str, int]
+    def __init__(self, suggested_books: _Optional[_Iterable[_Union[Book, _Mapping]]] = ..., vector_clock: _Optional[_Mapping[str, int]] = ...) -> None: ...
 
 class BookOrder(_message.Message):
     __slots__ = ("name", "quantity")

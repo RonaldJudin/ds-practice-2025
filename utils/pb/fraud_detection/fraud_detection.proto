@@ -38,18 +38,22 @@ message HelloResponse {
 
 message FraudDetectionRequest {
     string order_id = 1;
+    map<string, int32> vector_clock = 2;
 }
 
 message FraudDetectionResponse {
     bool is_fraudulent = 1;
+    map<string, int32> vector_clock = 2;
 }
 
 message CreditCardRequest {
     string order_id = 1;
+    map<string, int32> vector_clock = 2;
 }
 
 message CreditCardResponse {
     bool is_verified = 1;
+    map<string, int32> vector_clock = 2;
 }
 
 message Book {

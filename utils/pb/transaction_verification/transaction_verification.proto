@@ -40,22 +40,27 @@ message TransactionVerificationRequest {
 
 message TransactionVerificationResponse {
     bool is_verified = 1;
+    map<string, int32> vector_clock = 2;
 }
 
 message TVRequest {
     string order_id = 1;
+    map<string, int32> vector_clock = 2;
 }
 
 message VerifyBookListResponse {
     bool is_verified = 1;
+    map<string, int32> vector_clock = 2;
 }
 
 message VerifyUserDataResponse {
     bool is_verified = 1;
+    map<string, int32> vector_clock = 2;
 }
 
 message VerifyCreditCardFormatResponse {
     bool is_verified = 1;
+    map<string, int32> vector_clock = 2;
 }
 
 message Book {

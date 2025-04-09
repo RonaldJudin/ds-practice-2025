@@ -46,28 +46,64 @@ class HelloResponse(_message.Message):
     def __init__(self, greeting: _Optional[str] = ...) -> None: ...
 
 class FraudDetectionRequest(_message.Message):
-    __slots__ = ("order_id",)
+    __slots__ = ("order_id", "vector_clock")
+    class VectorClockEntry(_message.Message):
+        __slots__ = ("key", "value")
+        KEY_FIELD_NUMBER: _ClassVar[int]
+        VALUE_FIELD_NUMBER: _ClassVar[int]
+        key: str
+        value: int
+        def __init__(self, key: _Optional[str] = ..., value: _Optional[int] = ...) -> None: ...
     ORDER_ID_FIELD_NUMBER: _ClassVar[int]
+    VECTOR_CLOCK_FIELD_NUMBER: _ClassVar[int]
     order_id: str
-    def __init__(self, order_id: _Optional[str] = ...) -> None: ...
+    vector_clock: _containers.ScalarMap[str, int]
+    def __init__(self, order_id: _Optional[str] = ..., vector_clock: _Optional[_Mapping[str, int]] = ...) -> None: ...
 
 class FraudDetectionResponse(_message.Message):
-    __slots__ = ("is_fraudulent",)
+    __slots__ = ("is_fraudulent", "vector_clock")
+    class VectorClockEntry(_message.Message):
+        __slots__ = ("key", "value")
+        KEY_FIELD_NUMBER: _ClassVar[int]
+        VALUE_FIELD_NUMBER: _ClassVar[int]
+        key: str
+        value: int
+        def __init__(self, key: _Optional[str] = ..., value: _Optional[int] = ...) -> None: ...
     IS_FRAUDULENT_FIELD_NUMBER: _ClassVar[int]
+    VECTOR_CLOCK_FIELD_NUMBER: _ClassVar[int]
     is_fraudulent: bool
-    def __init__(self, is_fraudulent: bool = ...) -> None: ...
+    vector_clock: _containers.ScalarMap[str, int]
+    def __init__(self, is_fraudulent: bool = ..., vector_clock: _Optional[_Mapping[str, int]] = ...) -> None: ...
 
 class CreditCardRequest(_message.Message):
-    __slots__ = ("order_id",)
+    __slots__ = ("order_id", "vector_clock")
+    class VectorClockEntry(_message.Message):
+        __slots__ = ("key", "value")
+        KEY_FIELD_NUMBER: _ClassVar[int]
+        VALUE_FIELD_NUMBER: _ClassVar[int]
+        key: str
+        value: int
+        def __init__(self, key: _Optional[str] = ..., value: _Optional[int] = ...) -> None: ...
     ORDER_ID_FIELD_NUMBER: _ClassVar[int]
+    VECTOR_CLOCK_FIELD_NUMBER: _ClassVar[int]
     order_id: str
-    def __init__(self, order_id: _Optional[str] = ...) -> None: ...
+    vector_clock: _containers.ScalarMap[str, int]
+    def __init__(self, order_id: _Optional[str] = ..., vector_clock: _Optional[_Mapping[str, int]] = ...) -> None: ...
 
 class CreditCardResponse(_message.Message):
-    __slots__ = ("is_verified",)
+    __slots__ = ("is_verified", "vector_clock")
+    class VectorClockEntry(_message.Message):
+        __slots__ = ("key", "value")
+        KEY_FIELD_NUMBER: _ClassVar[int]
+        VALUE_FIELD_NUMBER: _ClassVar[int]
+        key: str
+        value: int
+        def __init__(self, key: _Optional[str] = ..., value: _Optional[int] = ...) -> None: ...
     IS_VERIFIED_FIELD_NUMBER: _ClassVar[int]
+    VECTOR_CLOCK_FIELD_NUMBER: _ClassVar[int]
     is_verified: bool
-    def __init__(self, is_verified: bool = ...) -> None: ...
+    vector_clock: _containers.ScalarMap[str, int]
+    def __init__(self, is_verified: bool = ..., vector_clock: _Optional[_Mapping[str, int]] = ...) -> None: ...
 
 class Book(_message.Message):
     __slots__ = ("name", "quantity")
