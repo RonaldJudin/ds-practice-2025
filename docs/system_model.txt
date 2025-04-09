@@ -1,0 +1,9 @@
+The online bookstore operates using a hybrid model, combining centralized and decentralized
+components for enhanced flexibility. The client (user) interacts with a centralized web server to
+make book purchase requests. The web server communicates asynchronously with a dedicated transaction
+server, fraud detection server, and book suggestions server. This allows for it to execute multiple
+tasks using multi-threading, improving performance and response time. Errors are handled gracefully,
+allowing the servers to continue running when met with an error. When errors occur, messages are sent 
+to the front-end for improved transparency. Multiple replicas are spun up on launch with leader
+election allowing for automatic recovery if a replica goes down. A queue service moderates the flow
+of requests to prevent the replicas from thrashing.
