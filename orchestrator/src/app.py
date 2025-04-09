@@ -38,6 +38,16 @@ import order_queue_pb2 as order_queue
 import order_queue_pb2_grpc as order_queue_grpc
 import grpc
 
+# Easy way to merge vector clocks
+def merge_vector_clocks(vc1, vc2):
+    """
+    Merge two vector clocks by taking the maximum value for each key.
+    """
+    merged_vc = vc1.copy()
+    for key, value in vc2.items():
+        merged_vc[key] = max(merged_vc.get(key, 0), value)
+    return merged_vc
+
 
 def greet(name="you"):
     # Establish a connection with the fraud-detection gRPC service.
@@ -213,6 +223,7 @@ def handle_fraud_detection_cc(order_data):
         # Build the gRPC request
         fraud_request = fraud_detection.FraudDetectionRequest(
             order_id=order_data["order_id"],
+            vector_clock=order_data["vector_clock"],
         )
 
         response = stub.CheckCreditCard(fraud_request)
@@ -229,6 +240,7 @@ def handle_suggestions(user_data):
         # Build the gRPC request
         suggestions_request = suggestions.SuggestionsRequest(
             order_id=user_data["order_id"],
+            vector_clock=user_data["vector_clock"],
         )
 
         response = stub.GetSuggestions(suggestions_request)
@@ -247,6 +259,7 @@ def handle_transaction_verification_a(transaction_data):
         transaction_verification_request = (
             transaction_verification.TVRequest(
                 order_id=transaction_data["order_id"],
+                vector_clock=transaction_data["vector_clock"],
                 )
             )
 
@@ -265,6 +278,7 @@ def handle_transaction_verification_b(transaction_data):
         transaction_verification_request = (
             transaction_verification.TVRequest(
                 order_id=transaction_data["order_id"],
+                vector_clock=transaction_data["vector_clock"],
                 )
             )
 
@@ -283,6 +297,7 @@ def handle_transaction_verification(transaction_data):
         transaction_verification_request = (
             transaction_verification.TVRequest(
                 order_id=transaction_data["order_id"],
+                vector_clock=transaction_data["vector_clock"],
                 )
             )
 
@@ -327,6 +342,16 @@ def checkout():
         - Logs errors if any occur during processing.
     """
     try:
+        # Init vector clock (originally initialized as a class, but changed to a dict for simplicity)
+        vc = {
+            "orchestrator": 0,
+            "fraud_detection": 0,
+            "suggestions": 0,
+            "transaction_verification": 0,
+        }
+        # Increment orchestrator vector clock
+        vc["orchestrator"] += 1
+        print(vc)
         # Get request object data to json
         request_data = json.loads(request.data)
         # Print request object data
@@ -364,18 +389,28 @@ def checkout():
             "terms_accepted": terms_accepted,
         }
 
-        order_id_request = {"order_id": order_id}
-
         logger.info("Received submit order request")
 
         # Initialise the executor
         executor = futures.ThreadPoolExecutor(max_workers=3)
 
-        # Initialise the order in the microservices
+        # Initialise the order in the microservices and increment each's vector clock by 1
+        vc["fraud_detection"] += 1
+        print(vc)
         fraud_detection_init_order = executor.submit(handle_init_order_fraud_detection, order_data)
+        vc["suggestions"] += 1
+        print(vc)
         suggestions_init_order = executor.submit(handle_init_order_suggestions, order_data)
+        vc["transaction_verification"] += 1
+        print(vc)
         transaction_verification_init_order = executor.submit(handle_init_order_transaction_verification, order_data)
         print(fraud_detection_init_order.result(), suggestions_init_order.result(), transaction_verification_init_order.result())
+
+        # Increment orchestrator vector clock after initialising the order with the microservices
+        vc["orchestrator"] += 1
+        print(vc)
+
+        order_id_request = {"order_id": order_id, "vector_clock": vc}
 
         # Events a and b: check if the book list is nonempty and if the user data is complete
         future_tv_booklist = executor.submit(
@@ -385,6 +420,17 @@ def checkout():
             handle_transaction_verification_b, order_id_request
             ) # Event d is also called inside
         
+        # Consolidate and merge vector clocks
+        clock_ac = future_tv_booklist.result().vector_clock
+        clock_bd = future_tv_userdata.result().vector_clock
+        vc = merge_vector_clocks(vc, clock_ac)
+        vc = merge_vector_clocks(vc, clock_bd)
+
+        vc["orchestrator"] += 1
+        print(vc)
+        # Update the vector clock in the order_id_request
+        order_id_request["vector_clock"] = vc
+
         # Events a, b, c and d: wait for the results of the book list and user data verification
         if not future_tv_booklist.result().is_verified:
             order_status_response = {
@@ -416,6 +462,16 @@ def checkout():
             handle_fraud_detection_cc, order_id_request
         )
         logger.info("Transaction Verification Service: Request sent.")
+
+        # Consolidate and merge vector clocks
+        clock_k = future_fd_cc.result().vector_clock
+        clock_e = future_transaction_verification.result().vector_clock
+        vc = merge_vector_clocks(vc, clock_k)
+        vc = merge_vector_clocks(vc, clock_e)
+        vc["orchestrator"] += 1
+        print(vc)
+        # Update the vector clock in the order_id_request
+        order_id_request["vector_clock"] = vc
 
         # Events k and e: wait for Kanye's answer and credit card validation results
         if not future_fd_cc.result().is_verified:
@@ -454,6 +510,13 @@ def checkout():
             {"bookId": book.bookId, "title": book.title, "author": book.author}
             for book in suggestions_result.suggested_books
         ]
+        # Increment vector clock
+        clock_f = suggestions_result.vector_clock
+        vc = merge_vector_clocks(vc, clock_f)
+        vc["orchestrator"] += 1
+        print(vc)
+        # Update the vector clock in the order_id_request
+        order_id_request["vector_clock"] = vc
 
         # Queue the order
         future_order_queue = executor.submit(

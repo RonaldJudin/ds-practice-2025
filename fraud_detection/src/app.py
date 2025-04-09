@@ -100,6 +100,11 @@ class FraudDetectionService(fraud_detection_grpc.FraudDetectionServiceServicer):
         response.is_verified = is_verified
         logger.info("Fraud Detection Service: Credit card validation response sent.")
 
+        # Increment vector clock
+        request.vector_clock["fraud_detection"] += 1
+        print(request.vector_clock)
+        response.vector_clock.clear()  # Clear the existing map
+        response.vector_clock.update(request.vector_clock)  # Copy the vector clock
         return response
 
     def CheckFraud(self, request, context):
@@ -148,6 +153,12 @@ class FraudDetectionService(fraud_detection_grpc.FraudDetectionServiceServicer):
         # Create a FraudDetectionResponse object
         response = fraud_detection.FraudDetectionResponse()
         response.is_fraudulent = is_fraudulent
+
+        # Increment vector clock
+        request.vector_clock["fraud_detection"] += 1
+        print(request.vector_clock)
+        response.vector_clock.clear()  # Clear the existing map
+        response.vector_clock.update(request.vector_clock)  # Copy the vector clock
         logger.info("Fraud Detection Service: Response sent.")
         return response
 

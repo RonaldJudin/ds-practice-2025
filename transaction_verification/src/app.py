@@ -45,7 +45,7 @@ def analyze_sentiment(quote):
     sentiment_score = blob.sentiment.polarity
     return sentiment_score > -0.2
 
-def handle_fraud_detection(order_id):
+def handle_fraud_detection(order_id, vector_clock):
     """
     Process the fraud detection for the given order data.
     """
@@ -55,6 +55,7 @@ def handle_fraud_detection(order_id):
         # Build the gRPC request
         fraud_request = fraud_detection.FraudDetectionRequest(
             order_id=order_id,
+            vector_clock=vector_clock
         )
 
         response = stub.CheckFraud(fraud_request)
@@ -106,6 +107,11 @@ class TransactionVerificationService(
         book_list = self.orders[request.order_id]["items"]
         # Create a CheckBookListResponse object
         response = transaction_verification.VerifyBookListResponse()
+        # Increment the vector clock before embedded function call
+        request.vector_clock["transaction_verification"] += 1
+        print(request.vector_clock)
+        response.vector_clock.clear()  # Clear the existing map
+        response.vector_clock.update(request.vector_clock)  # Copy the vector clock
         # Check if the book list is empty
         response.is_verified = False
         if book_list:
@@ -122,16 +128,28 @@ class TransactionVerificationService(
         user_data = self.orders[request.order_id]["user"]
         billing_address = self.orders[request.order_id]["billing_address"]
         credit_card = self.orders[request.order_id]["credit_card"]
+
+        # Increment the vector clock
+        # current_value = request.vector_clock.get("transaction_verification", 0)
+        request.vector_clock["transaction_verification"] += 1
+        print(request.vector_clock)
         # Check that no fields in these data are empty
         response = transaction_verification.VerifyUserDataResponse()
+
+        response.vector_clock.clear()
+        response.vector_clock.update(request.vector_clock)
+
         response.is_verified = True if user_data.name and user_data.email and billing_address.street and billing_address.city and billing_address.state and billing_address.zip and billing_address.country and credit_card.number and credit_card.expiration_date and credit_card.cvv else False
         if response.is_verified:
             logger.info("Transaction Verification Service: User data verified. Proceeding to fraud detection.")
-            fraud_response = handle_fraud_detection(request.order_id)
+            fraud_response = handle_fraud_detection(request.order_id, request.vector_clock)
+            # If fraud_detection runs, add more up-to-date vector clock to response
+            response.vector_clock.clear()  # Clear the existing map
+            response.vector_clock.update(fraud_response.vector_clock)  # Copy the vector clock
             if fraud_response.is_fraudulent:
                 response.is_verified = False
-            return response
         logger.info("Transaction Verification Service: User data not verified. Rejecting order.")
+
         return response
     
     def VerifyCreditCardFormat(self, request, context):
@@ -144,6 +162,11 @@ class TransactionVerificationService(
             logger.info("Transaction Verification Service: Credit card format verified.")
         else:
             logger.info("Transaction Verification Service: Credit card format wrong. Rejecting order.")
+        # Increment the vector clock
+        request.vector_clock["transaction_verification"] += 1
+        print(request.vector_clock)
+        response.vector_clock.clear()  # Clear the existing map
+        response.vector_clock.update(request.vector_clock)  # Copy the vector clock
         return response
     
     def VerifyTransaction(self, request, context):
@@ -196,6 +219,12 @@ class TransactionVerificationService(
         logger.info(
             "Transaction Verification Service: Kanye West refused the transaction."
         )
+
+        # Increment the vector clock
+        request.vector_clock["transaction_verification"] += 1
+        print(request.vector_clock)
+        response.vector_clock.clear()  # Clear the existing map
+        response.vector_clock.update(request.vector_clock)  # Copy the vector clock
         return response
 
 

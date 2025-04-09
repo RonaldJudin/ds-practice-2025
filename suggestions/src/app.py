@@ -128,6 +128,12 @@ class SuggestionsService(suggestions_grpc.SuggestionsServiceServicer):
         response.suggested_books.extend(suggested_books)
         logger.info("Suggestions Service: Response sent.")
 
+        # Increment vector clock
+        request.vector_clock["suggestions"] += 1
+        print(request.vector_clock)
+        response.vector_clock.clear()  # Clear the existing map
+        response.vector_clock.update(request.vector_clock)  # Copy the vector clock
+
         return response
 
 
