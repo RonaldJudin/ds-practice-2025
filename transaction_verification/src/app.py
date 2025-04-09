@@ -148,7 +148,7 @@ class TransactionVerificationService(
             response.vector_clock.update(fraud_response.vector_clock)  # Copy the vector clock
             if fraud_response.is_fraudulent:
                 response.is_verified = False
-        logger.info("Transaction Verification Service: User data not verified. Rejecting order.")
+                logger.info("Transaction Verification Service: User data not verified. Rejecting order.")
 
         return response
     
