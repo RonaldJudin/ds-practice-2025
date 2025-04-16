@@ -394,7 +394,8 @@ def checkout():
         # Initialise the executor
         executor = futures.ThreadPoolExecutor(max_workers=3)
 
-        # Initialise the order in the microservices and increment each's vector clock by 1
+        # Temporarily commented out for checkpoint 3
+        """ # Initialise the order in the microservices and increment each's vector clock by 1
         vc["fraud_detection"] += 1
         print(vc)
         fraud_detection_init_order = executor.submit(handle_init_order_fraud_detection, order_data)
@@ -516,7 +517,10 @@ def checkout():
         vc["orchestrator"] += 1
         print(vc)
         # Update the vector clock in the order_id_request
-        order_id_request["vector_clock"] = vc
+        order_id_request["vector_clock"] = vc """
+
+        # TEMPORARY ORDER ID REQUEST
+        order_id_request = {"order_id": order_id}
 
         # Queue the order
         future_order_queue = executor.submit(
@@ -528,7 +532,7 @@ def checkout():
         order_status_response = {
             "orderId": order_id_request["order_id"],
             "status": "Order Approved",
-            "suggestedBooks": suggested_books,
+            "suggestedBooks": [{}] #suggested_books,
         }
 
         return json.dumps(order_status_response), 200
