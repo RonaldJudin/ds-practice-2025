@@ -3,8 +3,8 @@ syntax = "proto3";
 package books_database;
 
 service BooksDatabaseService {
-    rpc Read (ReadRequest) returns (ReadResponse);
-    rpc Write (WriteRequest) returns (WriteResponse);
+	rpc Read (ReadRequest) returns (ReadResponse);
+	rpc Write (WriteRequest) returns (WriteResponse);
 }
 
 message ReadRequest {
