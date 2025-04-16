@@ -12,8 +12,8 @@ message ReadRequest {
 }
 
 message ReadResponse {
-		int32 stock = 1;
-	}
+	int32 stock = 1;
+}
 
 message WriteRequest {
 	string title = 1;
