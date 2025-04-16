@@ -48,6 +48,7 @@ def get_random_book():
 
 class SuggestionsService(suggestions_grpc.SuggestionsServiceServicer):
     orders = {}
+
     def InitOrder(self, request, context):
         """
         Initializes a new order in the suggestions system.
@@ -85,7 +86,7 @@ class SuggestionsService(suggestions_grpc.SuggestionsServiceServicer):
         }
         response.order_id = request.order_id
         return response
-    
+
     def GetSuggestions(self, request, context):
         """
         Provides book suggestions by scraping random books from the OpenLibrary website.
