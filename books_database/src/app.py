@@ -23,7 +23,7 @@ from concurrent import futures
 
 
 class BooksDatabaseService(books_database_grpc.BooksDatabaseServiceServicer):
-    books = {"Book 1": 1, "Book 2": 1}
+    books = {"Book A": 1000000, "Book B": 2000000}
 
     def Read(self, request, context):
         title = request.title
