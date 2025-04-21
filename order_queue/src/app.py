@@ -99,6 +99,30 @@ class OrderQueueService(order_queue_grpc.OrderQueueServiceServicer):
         """
         response = order_queue.EnqueueResponse()
         order_id = request.order_id
+
+        logger.info(request.items)
+
+        order_data = {
+            "order_id": order_id,
+            "items": request.items,
+            "user": {"name": request.user.name, "email": request.user.email},
+            "credit_card": {
+                "number": request.credit_card.number,
+                "expiration_date": request.credit_card.expiration_date,
+                "cvv": request.credit_card.cvv,
+            },
+            "user_comment": request.user_comment,
+            "billing_address": {
+                "street": request.billing_address.street,
+                "city": request.billing_address.city,
+                "state": request.billing_address.state,
+                "zip": request.billing_address.zip,
+                "country": request.billing_address.country,
+            },
+            "shipping_method": request.shipping_method,
+            "gift_wrapping": request.gift_wrapping,
+            "terms_accepted": request.terms_accepted,
+        }
         
         # Calculate priority score
         priority = self.calculate_fft_priority(order_id)
@@ -106,7 +130,7 @@ class OrderQueueService(order_queue_grpc.OrderQueueServiceServicer):
         # Thread-safe enqueue operation
         with self.lock:
             # Store as max-heap using negative priority
-            heapq.heappush(self.heap, (-priority, self.counter, order_id))
+            heapq.heappush(self.heap, (-priority, self.counter, order_data))
             self.counter += 1
         
         logger.info(f"Order {order_id} enqueued with priority score {priority:.2f}")
@@ -128,9 +152,20 @@ class OrderQueueService(order_queue_grpc.OrderQueueServiceServicer):
         # Thread-safe dequeue operation
         with self.lock:
             if self.heap:
-                _, _, order_id = heapq.heappop(self.heap)
-                response.order_id = order_id
+                _, _, order_data = heapq.heappop(self.heap)
+                order_id = order_data["order_id"]
                 logger.info(f"Order {order_id} dequeued")
+                response = order_queue.DequeueResponse(
+                    order_id=order_data["order_id"],
+                    items=order_data["items"],
+                    user=order_data["user"],
+                    credit_card=order_data["credit_card"],
+                    user_comment=order_data["user_comment"],
+                    billing_address=order_data["billing_address"],
+                    shipping_method=order_data["shipping_method"],
+                    gift_wrapping=order_data["gift_wrapping"],
+                    terms_accepted=order_data["terms_accepted"],
+            )
             else:
                 response.order_id = ""
                 # logger.info("Dequeue attempted but queue was empty")

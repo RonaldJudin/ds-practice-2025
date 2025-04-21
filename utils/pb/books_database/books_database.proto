@@ -5,6 +5,8 @@ package books_database;
 service BooksDatabaseService {
 	rpc Read (ReadRequest) returns (ReadResponse);
 	rpc Write (WriteRequest) returns (WriteResponse);
+	rpc IncrementStock (WriteRequest) returns (WriteResponse);
+	rpc DecrementStock (WriteRequest) returns (WriteResponse);
 }
 
 message ReadRequest {

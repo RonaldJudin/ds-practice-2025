@@ -28,12 +28,26 @@ class BooksDatabaseService(books_database_grpc.BooksDatabaseServiceServicer):
     def Read(self, request, context):
         title = request.title
         return self.books[title]
-
+    
     def Write(self, request, context):
+        title = request.title
+        stock = request.new_stock
+
+        self.books[title] = stock
+        return True
+
+    def IncrementStock(self, request, context):
         title = request.title
         new_stock = request.new_stock
 
         self.books[title] += new_stock
+        return True
+    
+    def DecrementStock(self, request, context):
+        title = request.title
+        new_stock = request.new_stock
+
+        self.books[title] -= new_stock
         return True
 
 

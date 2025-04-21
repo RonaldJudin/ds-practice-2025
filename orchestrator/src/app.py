@@ -315,6 +315,14 @@ def handle_order_queue(order_data):
         # Build the gRPC request
         order_queue_request = order_queue.EnqueueRequest(
             order_id=order_data["order_id"],
+            items=order_data["items"],
+            user=order_data["user"],
+            credit_card=order_data["credit_card"],
+            user_comment=order_data["user_comment"],
+            billing_address=order_data["billing_address"],
+            shipping_method=order_data["shipping_method"],
+            gift_wrapping=order_data["gift_wrapping"],
+            terms_accepted=order_data["terms_accepted"],
         )
 
         response = stub.Enqueue(order_queue_request)
@@ -519,18 +527,15 @@ def checkout():
         # Update the vector clock in the order_id_request
         order_id_request["vector_clock"] = vc """
 
-        # TEMPORARY ORDER ID REQUEST
-        order_id_request = {"order_id": order_id}
-
         # Queue the order
         future_order_queue = executor.submit(
-            handle_order_queue, order_id_request
+            handle_order_queue, order_data
         )
         logger.info("Order Queue Service: Order queued.")
 
         # Final response with books following the provided YAML specification for the bookstore
         order_status_response = {
-            "orderId": order_id_request["order_id"],
+            "orderId": order_data["order_id"],
             "status": "Order Approved",
             "suggestedBooks": [{}] #suggested_books,
         }
