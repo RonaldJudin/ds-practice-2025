@@ -24,6 +24,7 @@ from concurrent import futures
 
 class BooksDatabaseService(books_database_grpc.BooksDatabaseServiceServicer):
     books = {"Book A": 1000000, "Book B": 2000000}
+    pending_transactions = {}
 
     def Read(self, request, context):
         title = request.title
@@ -49,6 +50,40 @@ class BooksDatabaseService(books_database_grpc.BooksDatabaseServiceServicer):
 
         self.books[title] -= new_stock
         return True
+
+    def Prepare(self, request, context):
+        order_id = request.order_id
+        title = request.title
+        stock = request.stock
+
+        if order_id in self.pending_transactions:
+            return books_database.PrepareResponse(ready=False)
+
+        self.pending_transactions[order_id] = (title, stock)
+        logger.info(f"BooksDatabaseService prepared for order: {order_id}")
+        return books_database.PrepareResponse(ready=True)
+    
+    def Commit(self, request, context):
+        order_id = request.order_id
+
+        if order_id not in self.pending_transactions:
+            return books_database.CommitResponse(success=False)
+
+        title, stock = self.pending_transactions[order_id]
+        self.books[title] -= stock
+        del self.pending_transactions[order_id]
+        logger.info(f"BooksDatabaseService committed for order: {order_id}")
+        return books_database.CommitResponse(success=True)
+    
+    def Abort(self, request, context):
+        order_id = request.order_id
+
+        if order_id in self.pending_transactions:
+            del self.pending_transactions[order_id]
+            logger.info(f"BooksDatabaseService aborted for order: {order_id}")
+            return books_database.AbortResponse(aborted=True)
+        
+        return books_database.AbortResponse(aborted=False)
 
 
 def serve():

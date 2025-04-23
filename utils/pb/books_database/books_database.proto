@@ -7,6 +7,10 @@ service BooksDatabaseService {
 	rpc Write (WriteRequest) returns (WriteResponse);
 	rpc IncrementStock (WriteRequest) returns (WriteResponse);
 	rpc DecrementStock (WriteRequest) returns (WriteResponse);
+
+	rpc Prepare(PrepareRequest) returns (PrepareResponse);
+  rpc Commit(CommitRequest) returns (CommitResponse);
+  rpc Abort(AbortRequest) returns (AbortResponse);
 }
 
 message ReadRequest {
@@ -24,4 +28,30 @@ message WriteRequest {
 
 message WriteResponse {
 	bool success = 1;
+}
+
+message PrepareRequest {
+	string order_id = 1;
+	string title = 2;
+	int32 stock = 3;
+}
+
+message PrepareResponse {
+	bool ready = 1;
+}
+
+message CommitRequest {
+	string order_id = 1;
+}
+
+message CommitResponse {
+	bool success = 1;
+}
+
+message AbortRequest {
+	string order_id = 1;
+}
+
+message AbortResponse {
+	bool aborted = 1;
 }
