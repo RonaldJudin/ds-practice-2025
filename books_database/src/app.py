@@ -26,30 +26,34 @@ class BooksDatabaseService(books_database_grpc.BooksDatabaseServiceServicer):
     books = {"Book A": 1000000, "Book B": 2000000}
     pending_transactions = {}
 
+    def __init__(self, database_id, known_ids):
+        self.database_id = database_id
+        self.known_ids = known_ids
+
     def Read(self, request, context):
-        title = request.title
-        return self.books[title]
+        return books_database.ReadResponse(stock=self.books[request.title])
     
     def Write(self, request, context):
         title = request.title
         stock = request.new_stock
 
         self.books[title] = stock
-        return True
+        return books_database.WriteResponse(success=True)
 
     def IncrementStock(self, request, context):
         title = request.title
         new_stock = request.new_stock
 
         self.books[title] += new_stock
-        return True
+        return books_database.WriteResponse(success=True)
     
     def DecrementStock(self, request, context):
         title = request.title
         new_stock = request.new_stock
 
         self.books[title] -= new_stock
-        return True
+        logger.info(f"BooksDatabaseService decremented stock for {title}: {new_stock}. In stock: {self.books[title]}")
+        return books_database.WriteResponse(success=True)
 
     def Prepare(self, request, context):
         order_id = request.order_id
@@ -89,11 +93,17 @@ class BooksDatabaseService(books_database_grpc.BooksDatabaseServiceServicer):
 def serve():
     # Create a gRPC server
     server = grpc.server(futures.ThreadPoolExecutor())
-    # Add SuggestionsService
+
+    # Get the database ID and known IDs from environment variables
+    database_id = int(os.getenv("DATABASE_ID"))
+    known_ids = os.getenv("KNOWN_IDS").split(",")
+    known_ids = [int(i) for i in known_ids]
+
+    # Add DatabaseService to the server
     books_database_grpc.add_BooksDatabaseServiceServicer_to_server(
-        BooksDatabaseService(), server
+        BooksDatabaseService(database_id, known_ids), server
     )
-    # Listen on port 50052
+    # Listen on designated port
     port = str(os.getenv("PORT"))
     server.add_insecure_port("[::]:" + port)
     # Start the server

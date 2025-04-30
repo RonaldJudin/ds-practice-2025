@@ -100,8 +100,6 @@ class OrderQueueService(order_queue_grpc.OrderQueueServiceServicer):
         response = order_queue.EnqueueResponse()
         order_id = request.order_id
 
-        logger.info(request.items)
-
         order_data = {
             "order_id": order_id,
             "items": request.items,

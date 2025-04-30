@@ -22,12 +22,18 @@ executor_grpc_path = os.path.abspath(
 order_queue_grpc_path = os.path.abspath(
     os.path.join(FILE, "../../../utils/pb/order_queue")
 )
+books_database_grpc_path = os.path.abspath(
+    os.path.join(FILE, "../../../utils/pb/books_database")
+)
 sys.path.insert(0, executor_grpc_path)
 sys.path.insert(0, order_queue_grpc_path)
+sys.path.insert(0, books_database_grpc_path)
 import executor_pb2 as executor
 import executor_pb2_grpc as executor_grpc
 import order_queue_pb2 as order_queue
 import order_queue_pb2_grpc as order_queue_grpc
+import books_database_pb2 as books_database
+import books_database_pb2_grpc as books_database_grpc
 
 import grpc
 from concurrent import futures
@@ -97,6 +103,18 @@ class ExecutorService(executor_grpc.ExecutorServiceServicer):
             # This is the only place where a node appoints itself leader
             self.leader_id = self.executor_id
 
+    def handle_database_query(self, order_data):
+        # This method is called when an order is dequeued
+        with grpc.insecure_channel("books_database_1:49664") as channel:
+            database_stub = books_database_grpc.BooksDatabaseServiceStub(channel)
+            for book in order_data["items"]:
+                # Decrement the stock of each book in the order
+                decrement_request = books_database.WriteRequest(
+                    title=book.name,
+                    new_stock=book.quantity,
+                )
+                database_stub.DecrementStock(decrement_request)
+
     def run(self):
         while True:
             if self.executor_id == self.leader_id:
@@ -107,6 +125,12 @@ class ExecutorService(executor_grpc.ExecutorServiceServicer):
                     dequeue_response = queue_stub.Dequeue(dequeue_request)
                     if dequeue_response.order_id:
                         logger.info(f"Executor {self.executor_id} dequeued order {dequeue_response.order_id}.")
+                        order_data = {
+                            "items": dequeue_response.items,
+                        }
+                        # Handle the order data (e.g., decrement stock in the database)
+                        self.handle_database_query(order_data)
+
                     else:
                         time.sleep(1)  # Sleep for a while if the queue is empty
             else:
