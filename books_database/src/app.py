@@ -33,11 +33,18 @@ class BooksDatabaseService(books_database_grpc.BooksDatabaseServiceServicer):
     def Read(self, request, context):
         return books_database.ReadResponse(stock=self.books[request.title])
     
+    def Exists(self, request, context):
+        title = request.title
+        exists = title in self.books.keys()
+        # This is not meant to be a writing function, but the response has the same fields.
+        return books_database.WriteResponse(success=exists)
+    
     def Write(self, request, context):
         title = request.title
         stock = request.new_stock
 
         self.books[title] = stock
+        logger.info(f"BooksDatabaseService wrote {title}: {stock}. In stock: {self.books[title]}")
         return books_database.WriteResponse(success=True)
 
     def IncrementStock(self, request, context):
@@ -45,6 +52,7 @@ class BooksDatabaseService(books_database_grpc.BooksDatabaseServiceServicer):
         new_stock = request.new_stock
 
         self.books[title] += new_stock
+        self.Replicate()
         return books_database.WriteResponse(success=True)
     
     def DecrementStock(self, request, context):
@@ -53,7 +61,20 @@ class BooksDatabaseService(books_database_grpc.BooksDatabaseServiceServicer):
 
         self.books[title] -= new_stock
         logger.info(f"BooksDatabaseService decremented stock for {title}: {new_stock}. In stock: {self.books[title]}")
+        self.Replicate()
         return books_database.WriteResponse(success=True)
+    
+    def Replicate(self):
+        # Sends the state of the database to the other databases
+        for other_id in self.known_ids:
+            if other_id != self.database_id:
+                # The databases should run on ports 49664, 49665 and 49666.
+                with grpc.insecure_channel(f"books_database_{other_id}:{49663+other_id}") as channel:
+                    for title, stock in self.books.items():
+                        # Send the WriteRequest to the other database
+                        stub = books_database_grpc.BooksDatabaseServiceStub(channel)
+                        stub.Write(books_database.WriteRequest(title=title, new_stock=stock))
+
 
     def Prepare(self, request, context):
         order_id = request.order_id
