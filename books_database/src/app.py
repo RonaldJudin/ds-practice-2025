@@ -44,7 +44,7 @@ class BooksDatabaseService(books_database_grpc.BooksDatabaseServiceServicer):
         stock = request.new_stock
 
         self.books[title] = stock
-        logger.info(f"BooksDatabaseService wrote {title}: {stock}. In stock: {self.books[title]}")
+        logger.info(f"BooksDatabaseService ({self.database_id}) wrote {title}: {stock}. In stock: {self.books[title]}")
         return books_database.WriteResponse(success=True)
 
     def IncrementStock(self, request, context):
@@ -56,11 +56,11 @@ class BooksDatabaseService(books_database_grpc.BooksDatabaseServiceServicer):
         return books_database.WriteResponse(success=True)
     
     def DecrementStock(self, request, context):
-        title = request.title
-        new_stock = request.new_stock
+        title = request["title"]
+        new_stock = request["new_stock"]
 
         self.books[title] -= new_stock
-        logger.info(f"BooksDatabaseService decremented stock for {title}: {new_stock}. In stock: {self.books[title]}")
+        logger.info(f"BooksDatabaseService ({self.database_id}) decremented stock for {title}: {new_stock}. In stock: {self.books[title]}")
         self.Replicate()
         return books_database.WriteResponse(success=True)
     
@@ -75,29 +75,42 @@ class BooksDatabaseService(books_database_grpc.BooksDatabaseServiceServicer):
                         stub = books_database_grpc.BooksDatabaseServiceStub(channel)
                         stub.Write(books_database.WriteRequest(title=title, new_stock=stock))
 
-
     def Prepare(self, request, context):
         order_id = request.order_id
         title = request.title
         stock = request.stock
 
+        # Check if the book is already part of the pending transaction for this order
         if order_id in self.pending_transactions:
-            return books_database.PrepareResponse(ready=False)
+            for existing_title, _ in self.pending_transactions[order_id]:
+                if existing_title == title:
+                    logger.error(f"Duplicate prepare request for order {order_id}, book {title}.")
+                    return books_database.PrepareResponse(ready=False)
 
-        self.pending_transactions[order_id] = (title, stock)
-        logger.info(f"BooksDatabaseService prepared for order: {order_id}")
+        # Add the book to the pending transaction
+        if order_id not in self.pending_transactions:
+            self.pending_transactions[order_id] = []
+        self.pending_transactions[order_id].append((title, stock))
+
+        # logger.info(f"BooksDatabaseService prepared for order: {order_id}, book: {title}")
         return books_database.PrepareResponse(ready=True)
-    
+
+
     def Commit(self, request, context):
         order_id = request.order_id
 
         if order_id not in self.pending_transactions:
+            logger.error(f"Commit failed: No pending transaction for order {order_id}.")
             return books_database.CommitResponse(success=False)
 
-        title, stock = self.pending_transactions[order_id]
-        self.books[title] -= stock
+        # Commit all books in the pending transaction
+        for title, stock in self.pending_transactions[order_id]:
+            self.DecrementStock({"title": title, "new_stock": stock}, None)
+            # logger.info(f"BooksDatabaseService committed for order {order_id}, book: {title}, stock decremented by {stock}.")
+
+        # Remove the transaction from pending_transactions
         del self.pending_transactions[order_id]
-        logger.info(f"BooksDatabaseService committed for order: {order_id}")
+        # logger.info(f"BooksDatabaseService committed for order: {order_id}")
         return books_database.CommitResponse(success=True)
     
     def Abort(self, request, context):

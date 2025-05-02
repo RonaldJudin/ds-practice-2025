@@ -25,20 +25,164 @@ order_queue_grpc_path = os.path.abspath(
 books_database_grpc_path = os.path.abspath(
     os.path.join(FILE, "../../../utils/pb/books_database")
 )
+payment_grpc_path = os.path.abspath(
+    os.path.join(FILE, "../../../utils/pb/payment")
+)
 sys.path.insert(0, executor_grpc_path)
 sys.path.insert(0, order_queue_grpc_path)
 sys.path.insert(0, books_database_grpc_path)
+sys.path.insert(0, payment_grpc_path)
 import executor_pb2 as executor
 import executor_pb2_grpc as executor_grpc
 import order_queue_pb2 as order_queue
 import order_queue_pb2_grpc as order_queue_grpc
 import books_database_pb2 as books_database
 import books_database_pb2_grpc as books_database_grpc
+import payment_pb2 as payment
+import payment_pb2_grpc as payment_grpc
 
 import grpc
 from concurrent import futures
 import threading
 
+# 2PC (Phase Commit) logic
+def two_phase_commit(order_id, order_data):
+    """
+    Perform a two-phase commit for the given order ID and order data.
+    """
+    logger.info(f"Starting two-phase commit for order {order_id}")
+
+    # Phase 1: Prepare
+    logger.info(f"Phase 1: Preparing Books Database for order {order_id}")
+    if not handle_database_prepare(order_id, order_data):
+        logger.error(f"Preparation failed for Books Database. Aborting.")
+        handle_database_abort(order_id)
+        handle_payment_abort(order_id)
+        return False
+
+    logger.info(f"Phase 1: Preparing Payment Service for order {order_id}")
+    if not handle_payment_prepare(order_id):
+        logger.error(f"Preparation failed for Payment Service. Aborting.")
+        handle_database_abort(order_id)
+        handle_payment_abort(order_id)
+        return False
+
+    # Phase 2: Commit
+    logger.info(f"Phase 2: Committing Books Database for order {order_id}")
+    handle_database_commit(order_id)
+
+    logger.info(f"Phase 2: Committing Payment Service for order {order_id}")
+    handle_payment_commit(order_id)
+
+    return True
+
+    
+def handle_database_prepare(order_id, order_data):
+    """
+    Send a Prepare request to the Books Database Service for each book in the order.
+    """
+    with grpc.insecure_channel("books_database_1:49664") as channel:
+        database_stub = books_database_grpc.BooksDatabaseServiceStub(channel)
+        for book in order_data["items"]:
+            prepare_request = books_database.PrepareRequest(
+                order_id=order_id,
+                title=book.name,
+                stock=book.quantity,
+            )
+            try:
+                response = database_stub.Prepare(prepare_request)
+                if not response.ready:
+                    logger.error(f"BooksDatabaseService not ready for order {order_id}, book {book.name}.")
+                    return False
+                logger.info(f"BooksDatabaseService prepared for order {order_id}, book {book.name}.")
+            except grpc.RpcError as e:
+                logger.error(f"Error preparing BooksDatabaseService for order {order_id}, book {book.name}: {e}")
+                return False
+    return True
+
+def handle_database_commit(order_id):
+    """
+    Send a Commit request to the Books Database Service for the given order.
+    """
+    with grpc.insecure_channel("books_database_1:49664") as channel:
+        database_stub = books_database_grpc.BooksDatabaseServiceStub(channel)
+        commit_request = books_database.CommitRequest(order_id=order_id)
+        try:
+            response = database_stub.Commit(commit_request)
+            if response.success:
+                logger.info(f"BooksDatabaseService committed for order {order_id}.")
+            else:
+                logger.error(f"BooksDatabaseService failed to commit for order {order_id}.")
+        except grpc.RpcError as e:
+            logger.error(f"Error committing BooksDatabaseService for order {order_id}: {e}")
+
+def handle_database_abort(order_id):
+    """
+    Send an Abort request to the Books Database Service for the given order.
+    """
+    with grpc.insecure_channel("books_database_1:49664") as channel:
+        database_stub = books_database_grpc.BooksDatabaseServiceStub(channel)
+        abort_request = books_database.AbortRequest(order_id=order_id)
+        try:
+            response = database_stub.Abort(abort_request)
+            if response.aborted:
+                logger.info(f"BooksDatabaseService aborted for order {order_id}.")
+            else:
+                logger.error(f"BooksDatabaseService failed to abort for order {order_id}.")
+        except grpc.RpcError as e:
+            logger.error(f"Error aborting BooksDatabaseService for order {order_id}: {e}")
+
+def handle_payment_prepare(order_id):
+    """
+    Send a Prepare request to the Payment Service for the given order.
+    """
+    with grpc.insecure_channel("payment:50058") as channel:
+        payment_stub = payment_grpc.PaymentServiceStub(channel)
+        prepare_request = payment.PrepareRequest(order_id=order_id)
+        try:
+            response = payment_stub.Prepare(prepare_request)
+            if response.ready:
+                logger.info(f"PaymentService prepared for order {order_id}.")
+                return True
+            else:
+                logger.error(f"PaymentService not ready for order {order_id}.")
+                return False
+        except grpc.RpcError as e:
+            logger.error(f"Error preparing PaymentService for order {order_id}: {e}")
+            return False
+
+def handle_payment_commit(order_id):
+    """
+    Send a Commit request to the Payment Service for the given order.
+    """
+    with grpc.insecure_channel("payment:50058") as channel:
+        payment_stub = payment_grpc.PaymentServiceStub(channel)
+        commit_request = payment.CommitRequest(order_id=order_id)
+        try:
+            response = payment_stub.Commit(commit_request)
+            if response.success:
+                logger.info(f"PaymentService committed for order {order_id}.")
+            else:
+                logger.error(f"PaymentService failed to commit for order {order_id}.")
+        except grpc.RpcError as e:
+            logger.error(f"Error committing PaymentService for order {order_id}: {e}")
+            
+
+def handle_payment_abort(order_id):
+    """
+    Send an Abort request to the Payment Service for the given order.
+    """
+    with grpc.insecure_channel("payment:50058") as channel:
+        payment_stub = payment_grpc.PaymentServiceStub(channel)
+        abort_request = payment.AbortRequest(order_id=order_id)
+        try:
+            response = payment_stub.Abort(abort_request)
+            if response.aborted:
+                logger.info(f"PaymentService aborted for order {order_id}.")
+            else:
+                logger.error(f"PaymentService failed to abort for order {order_id}.")
+        except grpc.RpcError as e:
+            logger.error(f"Error aborting PaymentService for order {order_id}: {e}")
 class ExecutorService(executor_grpc.ExecutorServiceServicer):
     ids_ports = {1: "executor_1:50055", 2: "executor_2:50056", 3: "executor_3:50057"}
     def __init__(self, executor_id, known_ids, queue_stub):
@@ -125,11 +269,30 @@ class ExecutorService(executor_grpc.ExecutorServiceServicer):
                     dequeue_response = queue_stub.Dequeue(dequeue_request)
                     if dequeue_response.order_id:
                         logger.info(f"Executor {self.executor_id} dequeued order {dequeue_response.order_id}.")
+
+                        """ Example of order data:
+                        order_data = {
+                            "items": [{
+                                "title": "Book Title",
+                                "quantity": 1,
+                            }, {
+                                "title": "Another Book Title",
+                                "quantity": 2,
+                            }],
+                        }
+                        """
                         order_data = {
                             "items": dequeue_response.items,
                         }
                         # Handle the order data (e.g., decrement stock in the database)
-                        self.handle_database_query(order_data)
+                        # self.handle_database_query(order_data)
+                        # Perform two-phase commit with the participants
+                        if two_phase_commit(dequeue_response.order_id, order_data):
+                            logger.info(f"Order {dequeue_response.order_id} committed successfully.")
+                        else:
+                            logger.error(f"Order {dequeue_response.order_id} failed to commit.")
+                        
+                        
 
                     else:
                         time.sleep(1)  # Sleep for a while if the queue is empty

@@ -29,17 +29,17 @@ class PaymentService(payment_grpc.PaymentServiceServicer):
 
     def Prepare(self, request, context):
         self.prepared = True
-        logger.info(f"PaymentService prepared for order: {request.order_id}")
+        # logger.info(f"PaymentService prepared for order: {request.order_id}")
         return payment.PrepareResponse(ready=True)
     
     def Commit(self, request, context):
         if self.prepared:
-            logger.info(f"PaymentService committed for order: {request.order_id}")
+            # logger.info(f"PaymentService committed for order: {request.order_id}")
             return payment.CommitResponse(success=True)
 
     def Abort(self, request, context):
         self.prepared = False
-        logger.info(f"PaymentService aborted for order: {request.order_id}")
+        # logger.info(f"PaymentService aborted for order: {request.order_id}")
         return payment.AbortResponse(aborted=True)
      
 
@@ -50,8 +50,9 @@ def serve():
     payment_grpc.add_PaymentServiceServicer_to_server(
         PaymentService(), server
     )
-    # Listen on port 50052
-    port = str(os.getenv("PORT"))
+    # Listen on port 
+    # Listen on port 50058
+    port = "50058"
     server.add_insecure_port("[::]:" + port)
     # Start the server
     server.start()
