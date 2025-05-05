@@ -34,6 +34,7 @@ class PaymentService(payment_grpc.PaymentServiceServicer):
     
     def Commit(self, request, context):
         if self.prepared:
+            self.prepared = False
             # logger.info(f"PaymentService committed for order: {request.order_id}")
             return payment.CommitResponse(success=True)
 

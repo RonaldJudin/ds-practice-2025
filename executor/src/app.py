@@ -54,28 +54,43 @@ def two_phase_commit(order_id, order_data):
 
     # Phase 1: Prepare
     logger.info(f"Phase 1: Preparing Books Database for order {order_id}")
-    if not handle_database_prepare(order_id, order_data):
+    if not retry_request(handle_database_prepare, order_id=order_id, order_data=order_data):
         logger.error(f"Preparation failed for Books Database. Aborting.")
-        handle_database_abort(order_id)
-        handle_payment_abort(order_id)
+        retry_request(handle_database_abort, order_id=order_id)
+        retry_request(handle_payment_abort, order_id=order_id)
         return False
 
     logger.info(f"Phase 1: Preparing Payment Service for order {order_id}")
-    if not handle_payment_prepare(order_id):
+    if not retry_request(handle_payment_prepare, order_id=order_id):
         logger.error(f"Preparation failed for Payment Service. Aborting.")
-        handle_database_abort(order_id)
-        handle_payment_abort(order_id)
+        retry_request(handle_database_abort, order_id=order_id)
+        retry_request(handle_payment_abort, order_id=order_id)
         return False
 
     # Phase 2: Commit
     logger.info(f"Phase 2: Committing Books Database for order {order_id}")
-    handle_database_commit(order_id)
+    retry_request(handle_database_commit, order_id=order_id)
 
     logger.info(f"Phase 2: Committing Payment Service for order {order_id}")
-    handle_payment_commit(order_id)
+    retry_request(handle_payment_commit, order_id=order_id)
 
     return True
 
+# Exponential backoff for retrying requests if the service is not available
+# We implement infinite retries with a backoff factor of 2
+def retry_request(func, max_retries=7, backoff_factor=2, *args, **kwargs):
+    """
+    Retry a request with exponential backoff.
+    """
+    retries = 0
+    while True:
+        logger.info(f"Attempt ({retries + 1}/{max_retries}) for {func.__name__}")
+        try:
+            return func(*args, **kwargs)
+        except grpc.RpcError as e:
+            retries += 1
+            logger.error(f"Retry {retries}/{max_retries} failed: {e}")
+            time.sleep(backoff_factor ** retries)
     
 def handle_database_prepare(order_id, order_data):
     """
