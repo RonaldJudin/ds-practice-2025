@@ -20,6 +20,7 @@ import books_database_pb2_grpc as books_database_grpc
 
 import grpc
 from concurrent import futures
+import threading
 
 
 class BooksDatabaseService(books_database_grpc.BooksDatabaseServiceServicer):
@@ -29,6 +30,7 @@ class BooksDatabaseService(books_database_grpc.BooksDatabaseServiceServicer):
     def __init__(self, database_id, known_ids):
         self.database_id = database_id
         self.known_ids = known_ids
+        self.lock = threading.Lock()
 
     def Read(self, request, context):
         return books_database.ReadResponse(stock=self.books[request.title])
@@ -43,7 +45,9 @@ class BooksDatabaseService(books_database_grpc.BooksDatabaseServiceServicer):
         title = request.title
         stock = request.new_stock
 
-        self.books[title] = stock
+        # Take the lock before writing
+        with self.lock:
+            self.books[title] = stock
         logger.info(f"BooksDatabaseService ({self.database_id}) wrote {title}: {stock}. In stock: {self.books[title]}")
         return books_database.WriteResponse(success=True)
 
@@ -51,7 +55,10 @@ class BooksDatabaseService(books_database_grpc.BooksDatabaseServiceServicer):
         title = request.title
         new_stock = request.new_stock
 
-        self.books[title] += new_stock
+        # Take the lock before writing
+        with self.lock:
+            self.books[title] += new_stock
+        logger.info(f"BooksDatabaseService ({self.database_id}) incremented stock for {title}: {new_stock}. In stock: {self.books[title]}")
         self.Replicate()
         return books_database.WriteResponse(success=True)
     
@@ -59,7 +66,9 @@ class BooksDatabaseService(books_database_grpc.BooksDatabaseServiceServicer):
         title = request["title"]
         new_stock = request["new_stock"]
 
-        self.books[title] -= new_stock
+        # Take the lock before writing
+        with self.lock:
+            self.books[title] -= new_stock
         logger.info(f"BooksDatabaseService ({self.database_id}) decremented stock for {title}: {new_stock}. In stock: {self.books[title]}")
         self.Replicate()
         return books_database.WriteResponse(success=True)
