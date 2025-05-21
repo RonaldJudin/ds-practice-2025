@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2024) (preloaded format=pdflatex 2024.10.18)  17 MAY 2025 17:34
+This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2024) (preloaded format=pdflatex 2024.10.18)  21 MAY 2025 15:27
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -406,10 +406,14 @@ File: pgflibraryarrows.code.tex 2023-01-15 v3.1.10 (3.1.10)
 \TP@noteheight=\dimen331
 \TP@notebox=\box91
 \notelinewidth=\dimen332
- (/usr/local/texlive/2024/texmf-dist/tex/latex/extsizes/extarticle.cls
+
+
+Package tikzposter Warning: Unknown Option 30pt. on input line 204.
+
+(/usr/local/texlive/2024/texmf-dist/tex/latex/extsizes/extarticle.cls
 Document Class: extarticle 1996/10/08 v1.0 Non Standard LaTeX document class
-(/usr/local/texlive/2024/texmf-dist/tex/latex/extsizes/size20.clo
-File: size20.clo 1999/11/11 NON-Standard LaTeX file (size option)
+(/usr/local/texlive/2024/texmf-dist/tex/latex/base/size10.clo
+File: size10.clo 2024/02/08 v1.4n Standard LaTeX file (size option)
 ) (/usr/local/texlive/2024/texmf-dist/tex/latex/base/exscale.sty
 Package: exscale 2018/09/24 v2.1i Standard LaTeX package exscale
 LaTeX Font Info:    Redeclaring symbol font `largesymbols' on input line 57.
@@ -449,6 +453,14 @@ Package: iftex 2022/02/03 v1.0f TeX engine tests
 \Gm@layouthoffset=\dimen341
 \Gm@layoutvoffset=\dimen342
 \Gm@dimlist=\toks31
+) (/usr/local/texlive/2024/texmf-dist/tex/latex/a0poster/a0size.sty
+File: a0size.sty 2004/01/31 v1.22b a0poster class (GK, MW)
+LaTeX Font Info:    Redeclaring symbol font `largesymbols' on input line 229.
+LaTeX Font Info:    Overwriting symbol font `largesymbols' in version `normal'
+(Font)                  OMX/cmex/m/n --> OMX/cmex/m/n on input line 229.
+LaTeX Font Info:    Overwriting symbol font `largesymbols' in version `bold'
+(Font)                  OMX/cmex/m/n --> OMX/cmex/m/n on input line 229.
+\big@size=\dimen343
 )
 \pgf@layerbox@backgroundlayer=\box92
 \pgf@layerboxsaved@backgroundlayer=\box93
@@ -486,10 +498,10 @@ Package: amstext 2021/08/26 v2.01 AMS text
  (/usr/local/texlive/2024/texmf-dist/tex/latex/amsmath/amsgen.sty
 File: amsgen.sty 1999/11/30 v2.0 generic functions
 \@emptytoks=\toks35
-\ex@=\dimen343
+\ex@=\dimen344
 )) (/usr/local/texlive/2024/texmf-dist/tex/latex/amsmath/amsbsy.sty
 Package: amsbsy 1999/11/29 v1.2d Bold Symbols
-\pmbraise@=\dimen344
+\pmbraise@=\dimen345
 ) (/usr/local/texlive/2024/texmf-dist/tex/latex/amsmath/amsopn.sty
 Package: amsopn 2022/04/08 v2.04 operator names
 )
@@ -510,7 +522,7 @@ LaTeX Info: Redefining \big on input line 721.
 LaTeX Info: Redefining \Big on input line 722.
 LaTeX Info: Redefining \bigg on input line 723.
 LaTeX Info: Redefining \Bigg on input line 724.
-\big@size=\dimen345
+\big@size=\dimen346
 LaTeX Font Info:    Redeclaring font encoding OML on input line 742.
 LaTeX Font Info:    Redeclaring font encoding OMS on input line 743.
 \macc@depth=\count312
@@ -528,12 +540,12 @@ LaTeX Info: Redefining \Relbar on input line 970.
 \column@=\count317
 \maxfields@=\count318
 \andhelp@=\toks37
-\eqnshift@=\dimen346
-\alignsep@=\dimen347
-\tagshift@=\dimen348
-\tagwidth@=\dimen349
-\totwidth@=\dimen350
-\lineht@=\dimen351
+\eqnshift@=\dimen347
+\alignsep@=\dimen348
+\tagshift@=\dimen349
+\tagwidth@=\dimen350
+\totwidth@=\dimen351
+\lineht@=\dimen352
 \@envbody=\toks38
 \multlinegap=\skip55
 \multlinetaggap=\skip56
@@ -586,22 +598,22 @@ Package: trimclip 2020/08/19 v1.2 Trim and clip general TeX material
 Package: collectbox 2022/10/17 v0.4c Collect macro arguments as boxes
 \collectedbox=\box99
 )
-\tc@llx=\dimen352
-\tc@lly=\dimen353
-\tc@urx=\dimen354
-\tc@ury=\dimen355
+\tc@llx=\dimen353
+\tc@lly=\dimen354
+\tc@urx=\dimen355
+\tc@ury=\dimen356
 Package trimclip Info: Using driver 'tc-pdftex.def'.
  (/usr/local/texlive/2024/texmf-dist/tex/latex/adjustbox/tc-pdftex.def
 File: tc-pdftex.def 2019/01/04 v2.2 Clipping driver for pdftex
 ))
-\adjbox@Width=\dimen356
-\adjbox@Height=\dimen357
-\adjbox@Depth=\dimen358
-\adjbox@Totalheight=\dimen359
-\adjbox@pwidth=\dimen360
-\adjbox@pheight=\dimen361
-\adjbox@pdepth=\dimen362
-\adjbox@ptotalheight=\dimen363
+\adjbox@Width=\dimen357
+\adjbox@Height=\dimen358
+\adjbox@Depth=\dimen359
+\adjbox@Totalheight=\dimen360
+\adjbox@pwidth=\dimen361
+\adjbox@pheight=\dimen362
+\adjbox@pdepth=\dimen363
+\adjbox@ptotalheight=\dimen364
  (/usr/local/texlive/2024/texmf-dist/tex/latex/ifoddpage/ifoddpage.sty
 Package: ifoddpage 2022/10/18 v1.2 Conditionals for odd/even page detection
 \c@checkoddpage=\count323
@@ -609,13 +621,13 @@ Package: ifoddpage 2022/10/18 v1.2 Conditionals for odd/even page detection
 Package: varwidth 2009/03/30 ver 0.92;  Variable-width minipages
 \@vwid@box=\box100
 \sift@deathcycles=\count324
-\@vwid@loff=\dimen364
-\@vwid@roff=\dimen365
+\@vwid@loff=\dimen365
+\@vwid@roff=\dimen366
 )) (/usr/local/texlive/2024/texmf-dist/tex/latex/enumitem/enumitem.sty
 Package: enumitem 2019/06/20 v3.9 Customized lists
 \enitkv@toks@=\toks46
 \labelindent=\skip60
-\enit@outerparindent=\dimen366
+\enit@outerparindent=\dimen367
 \enit@toks=\toks47
 \enit@inbox=\box101
 \enit@count@id=\count325
@@ -909,14 +921,14 @@ LaTeX Font Info:    Trying to load font information for T1+phv on input line 116
 File: t1phv.fd 2020/03/25 scalable font definitions for T1/phv.
 )
 LaTeX Font Info:    Font shape `T1/phv/m/n' will be
-(Font)              scaled to size 19.70294pt on input line 116.
+(Font)              scaled to size 23.63593pt on input line 116.
 )
 Package csquotes Info: Checking for multilingual support...
 Package csquotes Info: ... none found.
 
 
 LaTeX Warning: Unused global option(s):
-    [margin=1in,innermargin=-4.5in,blockverticalspace=-0.25in].
+    [30pt,margin=1in,innermargin=-4.5in,blockverticalspace=-0.25in].
 
 (/Users/kaljunekvasil/Documents/UTartu/Spring 2025/Distributed_Systems/poster/.texpadtmp/poster.aux)
 \openout1 = `poster.aux'.
@@ -938,13 +950,13 @@ LaTeX Font Info:    ... okay on input line 47.
  (/usr/local/texlive/2024/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
 \scratchcounter=\count471
-\scratchdimen=\dimen367
+\scratchdimen=\dimen368
 \scratchbox=\box102
 \nofMPsegments=\count472
 \nofMParguments=\count473
 \everyMPshowfont=\toks48
 \MPscratchCnt=\count474
-\MPscratchDim=\dimen368
+\MPscratchDim=\dimen369
 \MPnumerator=\count475
 \makeMPintoPDFobject=\count476
 \everyMPtoPDFconversion=\toks49
@@ -978,15 +990,15 @@ File: epstopdf-sys.cfg 2010/07/13 v1.3 Configuration of (r)epstopdf for TeX Live
 * \textheight=3238.41853pt
 * \oddsidemargin=0.0pt
 * \evensidemargin=0.0pt
-* \topmargin=-50.0pt
-* \headheight=20.0pt
-* \headsep=30.0pt
-* \topskip=20.0pt
-* \footskip=35.0pt
-* \marginparwidth=0.0pt
-* \marginparsep=15.0pt
+* \topmargin=-37.0pt
+* \headheight=12.0pt
+* \headsep=25.0pt
+* \topskip=10.0pt
+* \footskip=30.0pt
+* \marginparwidth=65.0pt
+* \marginparsep=11.0pt
 * \columnsep=10.0pt
-* \skip\footins=16.0pt plus 6.0pt minus 3.0pt
+* \skip\footins=9.0pt plus 4.0pt minus 2.0pt
 * \hoffset=0.0pt
 * \voffset=0.0pt
 * \mag=1000
@@ -1013,14 +1025,7 @@ Package biblatex Info: Automatic encoding selection.
 
 Package biblatex Info: Trying to load bibliographic data...
 Package biblatex Info: ... file 'poster.bbl' found.
- (/Users/kaljunekvasil/Documents/UTartu/Spring 2025/Distributed_Systems/poster/.texpadtmp/poster.bbl
-Missing character: There is no [ in font nullfont!
-Missing character: There is no 1 in font nullfont!
-Missing character: There is no ] in font nullfont!
-Missing character: There is no [ in font nullfont!
-Missing character: There is no 2 in font nullfont!
-Missing character: There is no ] in font nullfont!
-)
+ (/Users/kaljunekvasil/Documents/UTartu/Spring 2025/Distributed_Systems/poster/.texpadtmp/poster.bbl)
 Package biblatex Info: Reference section=0 on input line 47.
 Package biblatex Info: Reference segment=0 on input line 47.
 
@@ -1028,42 +1033,13 @@ Missing character: There is no 1 in font nullfont!
 Missing character: There is no = in font nullfont!
 Missing character: There is no 1 in font nullfont!
 LaTeX Font Info:    Font shape `T1/phv/b/n' will be
-(Font)              scaled to size 19.70294pt on input line 49.
+(Font)              scaled to size 23.63593pt on input line 49.
 LaTeX Font Info:    Font shape `T1/phv/b/n' will be
-(Font)              scaled to size 49.01033pt on input line 49.
+(Font)              scaled to size 58.8238pt on input line 49.
 LaTeX Font Info:    Font shape `T1/phv/m/n' will be
-(Font)              scaled to size 49.01033pt on input line 49.
+(Font)              scaled to size 58.8238pt on input line 49.
 LaTeX Font Info:    Font shape `T1/phv/m/sc' will be
-(Font)              scaled to size 49.01033pt on input line 49.
-LaTeX Font Info:    Calculating math sizes for size <51.59> on input line 49.
-
-LaTeX Font Warning: Font shape `OT1/cmr/m/n' in size <25.795> not available
-(Font)              size <24.88> substituted on input line 49.
-
-
-LaTeX Font Warning: Font shape `OML/cmm/m/it' in size <51.59> not available
-(Font)              size <24.88> substituted on input line 49.
-
-
-LaTeX Font Warning: Font shape `OML/cmm/m/it' in size <36.11284> not available
-(Font)              size <24.88> substituted on input line 49.
-
-
-LaTeX Font Warning: Font shape `OML/cmm/m/it' in size <25.795> not available
-(Font)              size <24.88> substituted on input line 49.
-
-
-LaTeX Font Warning: Font shape `OMS/cmsy/m/n' in size <51.59> not available
-(Font)              size <24.88> substituted on input line 49.
-
-
-LaTeX Font Warning: Font shape `OMS/cmsy/m/n' in size <36.11284> not available
-(Font)              size <24.88> substituted on input line 49.
-
-
-LaTeX Font Warning: Font shape `OMS/cmsy/m/n' in size <25.795> not available
-(Font)              size <24.88> substituted on input line 49.
-
+(Font)              scaled to size 58.8238pt on input line 49.
 LaTeX Font Info:    Trying to load font information for U+msa on input line 49.
 (/usr/local/texlive/2024/texmf-dist/tex/latex/amsfonts/umsa.fd
 File: umsa.fd 2013/01/14 v3.01 AMS symbols A
@@ -1077,173 +1053,33 @@ LaTeX Font Info:    Trying to load font information for U+rsfs on input line 49.
 File: ursfs.fd 1998/03/24 rsfs font definition file (jk)
 )
 
-LaTeX Font Warning: Font shape `U/rsfs/m/n' in size <51.59> not available
+LaTeX Font Warning: Font shape `U/rsfs/m/n' in size <61.92> not available
 (Font)              size <24.88> substituted on input line 49.
 
 
-LaTeX Font Warning: Font shape `U/rsfs/m/n' in size <36.11284> not available
+LaTeX Font Warning: Font shape `U/rsfs/m/n' in size <43> not available
 (Font)              size <24.88> substituted on input line 49.
 
 
-LaTeX Font Warning: Font shape `U/rsfs/m/n' in size <25.795> not available
-(Font)              size <24.88> substituted on input line 49.
-
-
-LaTeX Font Warning: Font shape `OT1/cmr/bx/n' in size <25.795> not available
-(Font)              size <24.88> substituted on input line 49.
-
-
-LaTeX Font Warning: Font shape `OML/cmm/b/it' in size <51.59> not available
-(Font)              size <24.88> substituted on input line 49.
-
-
-LaTeX Font Warning: Font shape `OML/cmm/b/it' in size <36.11284> not available
-(Font)              size <24.88> substituted on input line 49.
-
-
-LaTeX Font Warning: Font shape `OML/cmm/b/it' in size <25.795> not available
-(Font)              size <24.88> substituted on input line 49.
-
-
-LaTeX Font Warning: Font shape `OMS/cmsy/b/n' in size <51.59> not available
-(Font)              size <24.88> substituted on input line 49.
-
-
-LaTeX Font Warning: Font shape `OMS/cmsy/b/n' in size <36.11284> not available
-(Font)              size <24.88> substituted on input line 49.
-
-
-LaTeX Font Warning: Font shape `OMS/cmsy/b/n' in size <25.795> not available
+LaTeX Font Warning: Font shape `U/rsfs/m/n' in size <29.86> not available
 (Font)              size <24.88> substituted on input line 49.
 
 LaTeX Font Info:    Font shape `T1/phv/m/n' will be
-(Font)              scaled to size 40.84036pt on input line 49.
+(Font)              scaled to size 49.01984pt on input line 49.
 LaTeX Font Info:    Font shape `T1/phv/b/n' will be
-(Font)              scaled to size 40.84036pt on input line 49.
-LaTeX Font Info:    Calculating math sizes for size <42.99> on input line 49.
+(Font)              scaled to size 49.01984pt on input line 49.
 
-LaTeX Font Warning: Font shape `OT1/cmr/m/n' in size <21.495> not available
-(Font)              size <20.74> substituted on input line 49.
-
-
-LaTeX Font Warning: Font shape `OML/cmm/m/it' in size <42.99> not available
+LaTeX Font Warning: Font shape `U/rsfs/m/n' in size <51.6> not available
 (Font)              size <24.88> substituted on input line 49.
-
-
-LaTeX Font Warning: Font shape `OML/cmm/m/it' in size <30.09286> not available
-(Font)              size <24.88> substituted on input line 49.
-
-
-LaTeX Font Warning: Font shape `OML/cmm/m/it' in size <21.495> not available
-(Font)              size <20.74> substituted on input line 49.
-
-
-LaTeX Font Warning: Font shape `OMS/cmsy/m/n' in size <42.99> not available
-(Font)              size <24.88> substituted on input line 49.
-
-
-LaTeX Font Warning: Font shape `OMS/cmsy/m/n' in size <30.09286> not available
-(Font)              size <24.88> substituted on input line 49.
-
-
-LaTeX Font Warning: Font shape `OMS/cmsy/m/n' in size <21.495> not available
-(Font)              size <20.74> substituted on input line 49.
-
-
-LaTeX Font Warning: Font shape `U/rsfs/m/n' in size <42.99> not available
-(Font)              size <24.88> substituted on input line 49.
-
-
-LaTeX Font Warning: Font shape `U/rsfs/m/n' in size <30.09286> not available
-(Font)              size <24.88> substituted on input line 49.
-
-
-LaTeX Font Warning: Font shape `U/rsfs/m/n' in size <21.495> not available
-(Font)              size <20.74> substituted on input line 49.
-
-
-LaTeX Font Warning: Font shape `OT1/cmr/bx/n' in size <21.495> not available
-(Font)              size <20.74> substituted on input line 49.
-
-
-LaTeX Font Warning: Font shape `OML/cmm/b/it' in size <42.99> not available
-(Font)              size <24.88> substituted on input line 49.
-
-
-LaTeX Font Warning: Font shape `OML/cmm/b/it' in size <30.09286> not available
-(Font)              size <24.88> substituted on input line 49.
-
-
-LaTeX Font Warning: Font shape `OML/cmm/b/it' in size <21.495> not available
-(Font)              size <20.74> substituted on input line 49.
-
-
-LaTeX Font Warning: Font shape `OMS/cmsy/b/n' in size <42.99> not available
-(Font)              size <24.88> substituted on input line 49.
-
-
-LaTeX Font Warning: Font shape `OMS/cmsy/b/n' in size <30.09286> not available
-(Font)              size <24.88> substituted on input line 49.
-
-
-LaTeX Font Warning: Font shape `OMS/cmsy/b/n' in size <21.495> not available
-(Font)              size <20.74> substituted on input line 49.
-
-LaTeX Font Info:    Font shape `T1/phv/m/n' will be
-(Font)              scaled to size 28.58812pt on input line 49.
-LaTeX Font Info:    Font shape `T1/phv/m/n' will be
-(Font)              scaled to size 34.03839pt on input line 49.
-LaTeX Font Info:    Calculating math sizes for size <35.83> on input line 49.
-
-LaTeX Font Warning: Font shape `OT1/cmr/m/n' in size <17.915> not available
-(Font)              size <17.28> substituted on input line 49.
-
-
-LaTeX Font Warning: Font shape `OML/cmm/m/it' in size <35.83> not available
-(Font)              size <24.88> substituted on input line 49.
-
-
-LaTeX Font Warning: Font shape `OML/cmm/m/it' in size <17.915> not available
-(Font)              size <17.28> substituted on input line 49.
-
-
-LaTeX Font Warning: Font shape `OMS/cmsy/m/n' in size <35.83> not available
-(Font)              size <24.88> substituted on input line 49.
-
-
-LaTeX Font Warning: Font shape `OMS/cmsy/m/n' in size <17.915> not available
-(Font)              size <17.28> substituted on input line 49.
 
 
 LaTeX Font Warning: Font shape `U/rsfs/m/n' in size <35.83> not available
 (Font)              size <24.88> substituted on input line 49.
 
-
-LaTeX Font Warning: Font shape `U/rsfs/m/n' in size <17.915> not available
-(Font)              size <17.28> substituted on input line 49.
-
-
-LaTeX Font Warning: Font shape `OT1/cmr/bx/n' in size <17.915> not available
-(Font)              size <17.28> substituted on input line 49.
-
-
-LaTeX Font Warning: Font shape `OML/cmm/b/it' in size <35.83> not available
-(Font)              size <24.88> substituted on input line 49.
-
-
-LaTeX Font Warning: Font shape `OML/cmm/b/it' in size <17.915> not available
-(Font)              size <17.28> substituted on input line 49.
-
-
-LaTeX Font Warning: Font shape `OMS/cmsy/b/n' in size <35.83> not available
-(Font)              size <24.88> substituted on input line 49.
-
-
-LaTeX Font Warning: Font shape `OMS/cmsy/b/n' in size <17.915> not available
-(Font)              size <17.28> substituted on input line 49.
-
 LaTeX Font Info:    Font shape `T1/phv/m/n' will be
-(Font)              scaled to size 23.82675pt on input line 49.
+(Font)              scaled to size 34.03839pt on input line 49.
+LaTeX Font Info:    Font shape `T1/phv/m/n' will be
+(Font)              scaled to size 40.84987pt on input line 49.
 File: unitartu_compact.png Graphic file (type png)
 <use unitartu_compact.png>
 Package pdftex.def Info: unitartu_compact.png  used on input line 49.
@@ -1253,32 +1089,80 @@ File: unitartu_compact.png Graphic file (type png)
 Package pdftex.def Info: unitartu_compact.png  used on input line 49.
 (pdftex.def)             Requested size: 767.00836pt x 259.6206pt.
 LaTeX Font Info:    Font shape `T1/phv/b/n' will be
-(Font)              scaled to size 34.03839pt on input line 65.
+(Font)              scaled to size 40.84987pt on input line 54.
 LaTeX Font Info:    Font shape `T1/phv/m/n' will be
-(Font)              scaled to size 23.63593pt on input line 65.
-<kitten.jpg, id=31, 452.3445pt x 301.563pt>
-File: kitten.jpg Graphic file (type jpg)
-<use kitten.jpg>
-Package pdftex.def Info: kitten.jpg  used on input line 65.
-(pdftex.def)             Requested size: 224.84569pt x 149.89764pt.
-File: kitten.jpg Graphic file (type jpg)
-<use kitten.jpg>
-Package pdftex.def Info: kitten.jpg  used on input line 65.
-(pdftex.def)             Requested size: 224.84569pt x 149.89764pt.
-LaTeX Font Info:    Font shape `T1/phv/m/it' in size <20.74> not available
-(Font)              Font shape `T1/phv/m/sl' tried instead on input line 105.
-LaTeX Font Info:    Font shape `T1/phv/m/sl' will be
-(Font)              scaled to size 19.70294pt on input line 105.
-LaTeX Font Info:    Font shape `T1/phv/m/sc' will be
-(Font)              scaled to size 19.70294pt on input line 105.
-LaTeX Font Info:    Trying to load font information for T1+aett on input line 105.
-(/usr/local/texlive/2024/texmf-dist/tex/latex/ae/t1aett.fd
-File: t1aett.fd 1997/11/16 Font definitions for T1/aett.
-)
+(Font)              scaled to size 28.3669pt on input line 54.
+<system_diagram.png, id=31, 1015.795pt x 894.34125pt>
+File: system_diagram.png Graphic file (type png)
+<use system_diagram.png>
+Package pdftex.def Info: system_diagram.png  used on input line 63.
+(pdftex.def)             Requested size: 1124.15988pt x 989.7829pt.
+File: system_diagram.png Graphic file (type png)
+<use system_diagram.png>
+Package pdftex.def Info: system_diagram.png  used on input line 63.
+(pdftex.def)             Requested size: 1124.15988pt x 989.7829pt.
+
+Overfull \hbox (82.21994pt too wide) detected at line 63
+[]
+ []
+
+
+Overfull \hbox (82.21994pt too wide) in paragraph at lines 63--63
+[][][]  
+ []
+
+<db_replication.png, id=32, 1585.925pt x 462.72874pt>
+File: db_replication.png Graphic file (type png)
+<use db_replication.png>
+Package pdftex.def Info: db_replication.png  used on input line 75.
+(pdftex.def)             Requested size: 1011.73703pt x 295.19925pt.
+File: db_replication.png Graphic file (type png)
+<use db_replication.png>
+Package pdftex.def Info: db_replication.png  used on input line 75.
+(pdftex.def)             Requested size: 1011.73703pt x 295.19925pt.
+<vector_clock.png, id=33, 602.25pt x 442.65375pt>
+File: vector_clock.png Graphic file (type png)
+<use vector_clock.png>
+Package pdftex.def Info: vector_clock.png  used on input line 85.
+(pdftex.def)             Requested size: 1124.15988pt x 826.42093pt.
+File: vector_clock.png Graphic file (type png)
+<use vector_clock.png>
+Package pdftex.def Info: vector_clock.png  used on input line 85.
+(pdftex.def)             Requested size: 1124.15988pt x 826.42093pt.
+
+Overfull \hbox (93.60086pt too wide) detected at line 85
+[]
+ []
+
+
+Overfull \hbox (93.60086pt too wide) in paragraph at lines 85--85
+[][][]  
+ []
+
+<consensus.png, id=34, 1182.4175pt x 647.41875pt>
+File: consensus.png Graphic file (type png)
+<use consensus.png>
+Package pdftex.def Info: consensus.png  used on input line 95.
+(pdftex.def)             Requested size: 1079.18387pt x 590.9104pt.
+File: consensus.png Graphic file (type png)
+<use consensus.png>
+Package pdftex.def Info: consensus.png  used on input line 95.
+(pdftex.def)             Requested size: 1079.18387pt x 590.9104pt.
+
+Overfull \hbox (48.62485pt too wide) detected at line 95
+[]
+ []
+
+
+Overfull \hbox (48.62485pt too wide) in paragraph at lines 95--95
+[][][]  
+ []
+
+
 
 [1
 
-{/usr/local/texlive/2024/texmf-var/fonts/map/pdftex/updmap/pdftex.map}{/usr/local/texlive/2024/texmf-dist/fonts/enc/dvips/base/8r.enc} <./unitartu_compact.png> <./kitten.jpg>] (/Users/kaljunekvasil/Documents/UTartu/Spring 2025/Distributed_Systems/poster/.texpadtmp/poster.aux)
+{/usr/local/texlive/2024/texmf-var/fonts/map/pdftex/updmap/pdftex.map}{/usr/local/texlive/2024/texmf-dist/fonts/enc/dvips/base/8r.enc} <./unitartu_compact.png> <./system_diagram.png> <./db_replication.png> <./vector_clock.png> <./consensus.png>] (/Users/kaljunekvasil/Documents/UTartu/Spring 2025/Distributed_Systems/poster/.texpadtmp/poster.aux)
  ***********
 LaTeX2e <2024-06-01> patch level 2
 L3 programming layer <2024-09-10>
@@ -1286,25 +1170,25 @@ L3 programming layer <2024-09-10>
 
 
 LaTeX Font Warning: Size substitutions with differences
-(Font)              up to 26.70999pt have occurred.
+(Font)              up to 37.04pt have occurred.
 
 Package logreq Info: Writing requests to 'poster.run.xml'.
 \openout1 = `poster.run.xml'.
 
  ) 
 Here is how much of TeX's memory you used:
- 29302 strings out of 473579
- 613939 string characters out of 5728227
- 1586658 words of memory out of 5000000
- 51647 multiletter control sequences out of 15000+600000
- 622871 words of font info for 151 fonts, out of 8000000 for 9000
+ 29060 strings out of 473579
+ 611597 string characters out of 5728227
+ 1564967 words of memory out of 5000000
+ 51412 multiletter control sequences out of 15000+600000
+ 608752 words of font info for 131 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 117i,20n,121p,695b,3036s stack positions out of 10000i,1000n,20000p,200000b,200000s
-</usr/local/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi12.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmr17.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt12.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1/urw/helvetic/uhvb8a.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1/urw/helvetic/uhvr8a.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1/urw/helvetic/uhvro8a.pfb>
-Output written on "/Users/kaljunekvasil/Documents/UTartu/Spring 2025/Distributed_Systems/poster/.texpadtmp/poster.pdf" (1 page, 254855 bytes).
+ 117i,20n,121p,1043b,2278s stack positions out of 10000i,1000n,20000p,200000b,200000s
+</usr/local/texlive/2024/texmf-dist/fonts/type1/urw/helvetic/uhvb8a.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1/urw/helvetic/uhvr8a.pfb>
+Output written on "/Users/kaljunekvasil/Documents/UTartu/Spring 2025/Distributed_Systems/poster/.texpadtmp/poster.pdf" (1 page, 1597286 bytes).
 PDF statistics:
- 75 PDF objects out of 1000 (max. 8388607)
- 38 compressed objects within 1 object stream
+ 57 PDF objects out of 1000 (max. 8388607)
+ 23 compressed objects within 1 object stream
  0 named destinations out of 1000 (max. 500000)
- 119 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 134 words of extra memory for PDF output out of 10000 (max. 10000000)
 

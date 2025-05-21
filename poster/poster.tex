@@ -1,4 +1,4 @@
-\documentclass[22pt,margin=1in,innermargin=-4.5in,blockverticalspace=-0.25in]{tikzposter}
+\documentclass[30pt,margin=1in,innermargin=-4.5in,blockverticalspace=-0.25in]{tikzposter}
 \geometry{paperwidth=33.11in,paperheight=46.81in} %A0
 % \geometry{paperheight=33.11in,paperwidth=23.4in} %A1
 \usepackage[utf8]{inputenc}
@@ -54,7 +54,9 @@
 	}
 
     \block{System Model}{
-The system follows a \textbf{distributed orchestration} model. A client submits an order to the \textbf{orchestrator}, which initiates \textbf{multithreaded parallel calls} to the \textbf{identity} and \textbf{inventory services}. These services perform \textbf{READ requests} against the \textbf{leader database} to validate the request. After receiving \textbf{APPROVED} responses from both services, the orchestrator adds the order to a \textbf{priority queue}. \textbf{Auto-scaling executors} then process orders from the queue, coordinating \textbf{two-phase commit (2PC)} transactions with the \textbf{shipping} and \textbf{payment services} which guarantees \textbf{ACID compliance} for writes. After both services acknowledge (\textbf{ACK}) the \textbf{Commit phase}, the executor \textbf{dequeues} the order and triggers the \textbf{notification service} to inform the user. Throughout this workflow, the \textbf{analytics service} asynchronously logs requests, errors, and metrics for observability. The design prioritizes \textbf{scalability} (with auto-scaling and multithreading), \textbf{consistency} (with 2PC and leader DB reads), and \textbf{fault tolerance} (with queue-based retries and analytics monitoring).
+The system follows a distributed orchestration model. A client submits an order to the orchestrator, which initiates multithreaded parallel calls to the identity and inventory services. These services perform READ requests against the leader database to validate the request. After receiving APPROVED responses from both services, the orchestrator adds the order to a priority queue. Auto-scaling executors then process orders from the queue, coordinating two-phase commit (2PC) transactions with the shipping and payment services which guarantees ACID compliance for writes. After both services acknowledge (ACK) the Commit phase, the executor dequeues the order and triggers the notification service to inform the user. Throughout this workflow, the analytics service asynchronously logs requests, errors, and metrics for observability. The design prioritizes scalability (with auto-scaling and multithreading), consistency (with 2PC and leader DB reads), and fault tolerance (with queue-based retries and analytics monitoring).
+
+
        \begin{align*}
             \includegraphics[width=0.5\textwidth,valign=c]{system_diagram}
         \end{align*}
@@ -62,50 +64,38 @@ The system follows a \textbf{distributed orchestration} model. A client submits 
     
  
     
-        \block{Commitment Protocol}{
-    
-The system uses \textbf{two-phase commit (2PC)} between the \textbf{executor}, \textbf{payment}, and \textbf{shipping service} to ensure atomic order processing. To handle failures, the system uses \textbf{optimistic exponential backoff} retries. If retries breach a set threshold, the \textbf{analytics service} can be used to track all logs, errors, and other specific order failure information.
-    
-   		\begin{align*}
-        	\includegraphics[width=0.5\textwidth,valign=c]{consensus}
-        \end{align*}
 
+            \block{Replication}{
+
+Two types of replication are used in our distributed system. The executor service uses queue-based replication. The auto-scaling executors are stateless and rely on the priority queue for order assignment. Unlike database replication, orders persist in the queue until successfully processed (durable) and executors scale dynamically based on queue size (elastic). The database uses a synchronous leader-follower replication. The leader handles all writes and the followers serve read requests. This behavior allows for strong consistency (followers mirror leader state before acknowledging reads) and fault tolerance (automatic elections during leader replica failure minimizes database downtime).
+
+       		\begin{align*}
+        \includegraphics[width=0.45\textwidth,valign=c]{db_replication}
+        \end{align*}
     }
-    
+
 
 
     \column{0.5}
    \block{Vector Clocks}{
-The \textbf{analytics service} uses vector clocks to track causal relationships between events across the entire workflow from order request to placement. This tracking can be used for monitoring \textbf{race conditions} in real-time and debugging in the future. Below shows the general expected vector clock tracking timeline. For readability purposes, we do not display the vector value at every event.
+The analytics service uses vector clocks to track causal relationships between events across the entire workflow from order request to placement. This tracking can be used for monitoring race conditions in real-time and debugging in the future. Below shows the general expected vector clock tracking timeline. For readability purposes, we do not display the vector value at every event.
  		\begin{align*}
         \includegraphics[width=0.5\textwidth,valign=c]{vector_clock}
         \end{align*}
     }
 
+        \block{Commitment Protocol}{
     
-        \block{Replication}{
-
-Two types of replication are used in our distributed system:
-\subsection*{Executor Replication (Queue-Based)}  
-\textbf{Auto-scaling executors} are stateless and rely on the \textbf{priority queue} for order assignment. Unlike database replication:
-\begin{itemize}  
-    \item \textbf{Durability}: Orders persist in the queue until successfully processed.
-    \item \textbf{Elasticity}: Executors scale dynamically based on queue size.  
-\end{itemize}  
-
-\subsection*{Database Replication (Leader-Follower)}  
-The database system uses \textbf{synchronous leader-follower replication}. The \textbf{leader} handles all writes and the \textbf{followers} serve read requests. This behavior allows for:  
-\begin{itemize}  
-    \item \textbf{Strong consistency}: Followers mirror leader state before acknowledging reads.  
-    \item \textbf{Fault tolerance}: Automatic elections during leader replica failure minimizes database downtime.  
-\end{itemize}  
-
-
-
-       		\begin{align*}
-        \includegraphics[width=0.3\textwidth,valign=c]{db_replication}
+The system uses two-phase commit (2PC) between the executor, payment, and shipping service to ensure atomic order processing. To handle failures, the system uses optimistic exponential backoff retries. If retries breach a set threshold, the analytics service can be used to track all logs, errors, and other specific order failure information.
+    
+   		\begin{align*}
+        	\includegraphics[width=0.48\textwidth,valign=c]{consensus}
         \end{align*}
-    }
 
+    }
+    
+    
+\block{Conclusion}{
+    This distributed order fulfillment system executes reliable e-commerce processing through orchestrated parallel verification, priority-based queuing, and fault-tolerant 2PC transactions. The architecture coordinates between stateless executors, strongly-consistent database replication, and broad service monitoring to achieve scalable, consistent order processing.}
 \end{columns}
 \end{document}
