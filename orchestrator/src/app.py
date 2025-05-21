@@ -8,6 +8,56 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+# Import Flask.
+# Flask is a web framework for Python.
+# It allows you to build a web application quickly.
+# For more information, see https://flask.palletsprojects.com/en/latest/
+from flask import Flask, request
+from flask_cors import CORS
+import json
+
+# Import utils for concurrent procesing
+from concurrent import futures
+
+# Create a simple Flask app.
+app = Flask(__name__)
+# Enable CORS for the app.
+CORS(app, resources={r"/*": {"origins": "*"}})
+
+# === OpenTelemetry Init ===
+from opentelemetry import trace
+from opentelemetry.sdk.resources import Resource
+from opentelemetry.sdk.trace import TracerProvider
+from opentelemetry.sdk.trace.export import BatchSpanProcessor
+from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
+from opentelemetry.instrumentation.flask import FlaskInstrumentor
+from opentelemetry.instrumentation.grpc import GrpcInstrumentorServer
+from opentelemetry.instrumentation.grpc import GrpcInstrumentorClient
+
+import os
+
+# Set up resource attributes (service name is important for Grafana)
+resource = Resource(attributes={
+    "service.name": os.environ.get("SERVICE_NAME", "orchestrator")
+})
+
+# Set up tracer provider and exporter
+trace.set_tracer_provider(TracerProvider(resource=resource))
+tracer_provider = trace.get_tracer_provider()
+otlp_exporter = OTLPSpanExporter(endpoint="http://observability:4317", insecure=True)
+span_processor = BatchSpanProcessor(otlp_exporter)
+tracer_provider.add_span_processor(span_processor)
+
+# Instrument Flask
+FlaskInstrumentor().instrument_app(app)
+
+# Instrument gRPC
+GrpcInstrumentorServer().instrument()
+GrpcInstrumentorClient().instrument()
+
+logger.info("OpenTelemetry initialized for service: %s", os.environ.get("SERVICE_NAME"))
+# === OpenTelemetry End ===
+
 # This set of lines are needed to import the gRPC stubs.
 # The path of the stubs is relative to the current file, or absolute inside the container.
 # Change these lines only if strictly needed.
@@ -57,15 +107,6 @@ def greet(name="you"):
         # Call the service through the stub object.
         response = stub.SayHello(fraud_detection.HelloRequest(name=name))
     return response.greeting
-
-
-# Import Flask.
-# Flask is a web framework for Python.
-# It allows you to build a web application quickly.
-# For more information, see https://flask.palletsprojects.com/en/latest/
-from flask import Flask, request
-from flask_cors import CORS
-import json
 
 # Import utils for concurrent procesing
 from concurrent import futures

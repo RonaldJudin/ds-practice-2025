@@ -30,6 +30,7 @@ services:
       # The PYTHONFILE environment variable specifies the absolute entry point of the application
       # Check app.py in the orchestrator directory to see how this is used
       - PYTHONFILE=/app/orchestrator/src/app.py
+      - SERVICE_NAME=orchestrator
     volumes:
       # Mount the utils directory in the current directory to the /app/utils directory in the container
       - ./utils:/app/utils
@@ -52,6 +53,7 @@ services:
       # The PYTHONFILE environment variable specifies the absolute entry point of the application
       # Check app.py in the fraud_detection directory to see how this is used
       - PYTHONFILE=/app/fraud_detection/src/app.py
+      - SERVICE_NAME=fraud_detection
     volumes:
       # Mount the utils directory in the current directory to the /app/utils directory in the container
       - ./utils:/app/utils
@@ -75,6 +77,7 @@ services:
       # The PYTHONFILE environment variable specifies the absolute entry point of the application
       # Check app.py in the fraud_detection directory to see how this is used
       - PYTHONFILE=/app/suggestions/src/app.py
+      - SERVICE_NAME=suggestions
     volumes:
       # Mount the utils directory in the current directory to the /app/utils directory in the container
       - ./utils:/app/utils
@@ -98,6 +101,7 @@ services:
       # The PYTHONFILE environment variable specifies the absolute entry point of the application
       # Check app.py in the fraud_detection directory to see how this is used
       - PYTHONFILE=/app/transaction_verification/src/app.py
+      - SERVICE_NAME=transaction_verification
     volumes:
       # Mount the utils directory in the current directory to the /app/utils directory in the container
       - ./utils:/app/utils
@@ -120,6 +124,7 @@ services:
       # The PYTHONFILE environment variable specifies the absolute entry point of the application
       # Check app.py in the fraud_detection directory to see how this is used
       - PYTHONFILE=/app/order_queue/src/app.py
+      - SERVICE_NAME=order_queue
     volumes:
       # Mount the utils directory in the current directory to the /app/utils directory in the container
       - ./utils:/app/utils
@@ -143,6 +148,7 @@ services:
       # The PYTHONFILE environment variable specifies the absolute entry point of the application
       # Check app.py in the fraud_detection directory to see how this is used
       - PYTHONFILE=/app/executor/src/app.py
+      - SERVICE_NAME=executor
       # The EXECUTOR_ID environment variable specifies the ID of the executor
       # This is used to identify the executor in the application
       - EXECUTOR_ID=1
@@ -170,6 +176,7 @@ services:
       # The PYTHONFILE environment variable specifies the absolute entry point of the application
       # Check app.py in the fraud_detection directory to see how this is used
       - PYTHONFILE=/app/executor/src/app.py
+      - SERVICE_NAME=executor
       # The EXECUTOR_ID environment variable specifies the ID of the executor
       # This is used to identify the executor in the application
       - EXECUTOR_ID=2
@@ -197,6 +204,7 @@ services:
       # The PYTHONFILE environment variable specifies the absolute entry point of the application
       # Check app.py in the fraud_detection directory to see how this is used
       - PYTHONFILE=/app/executor/src/app.py
+      - SERVICE_NAME=executor
       # The EXECUTOR_ID environment variable specifies the ID of the executor
       # This is used to identify the executor in the application
       - EXECUTOR_ID=3
@@ -224,6 +232,7 @@ services:
       # The PYTHONFILE environment variable specifies the absolute entry point of the application
       # Check app.py in the fraud_detection directory to see how this is used
       - PYTHONFILE=/app/books_database/src/app.py
+      - SERVICE_NAME=books_database
       # The EXECUTOR_ID environment variable specifies the ID of the executor
       # This is used to identify the executor in the application
       - DATABASE_ID=1
@@ -250,6 +259,7 @@ services:
       # The PYTHONFILE environment variable specifies the absolute entry point of the application
       # Check app.py in the fraud_detection directory to see how this is used
       - PYTHONFILE=/app/books_database/src/app.py
+      - SERVICE_NAME=books_database
       # The EXECUTOR_ID environment variable specifies the ID of the executor
       # This is used to identify the executor in the application
       - DATABASE_ID=2
@@ -276,6 +286,7 @@ services:
       # The PYTHONFILE environment variable specifies the absolute entry point of the application
       # Check app.py in the fraud_detection directory to see how this is used
       - PYTHONFILE=/app/books_database/src/app.py
+      - SERVICE_NAME=books_database
       # The EXECUTOR_ID environment variable specifies the ID of the executor
       # This is used to identify the executor in the application
       - DATABASE_ID=3
@@ -303,7 +314,17 @@ services:
       # The PYTHONFILE environment variable specifies the absolute entry point of the application
       # Check app.py in the fraud_detection directory to see how this is used
       - PYTHONFILE=/app/payment/src/app.py
+      - SERVICE_NAME=payment
     volumes:
       # Mount the utils directory in the current directory to the /app/utils directory in the container
       - ./utils:/app/utils
       - ./payment/src:/app/payment/src
+
+  observability:
+    image: grafana/otel-lgtm
+    ports:
+      - "3000:3000"
+      - "4317:4317"
+      - "4318:4318"
+    environment:
+      - OTEL_METRIC_EXPORT_INTERVAL=1000

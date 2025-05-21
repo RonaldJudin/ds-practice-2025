@@ -12,6 +12,34 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+# === OpenTelemetry Init ===
+from opentelemetry import trace
+from opentelemetry.sdk.resources import Resource
+from opentelemetry.sdk.trace import TracerProvider
+from opentelemetry.sdk.trace.export import BatchSpanProcessor
+from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
+from opentelemetry.instrumentation.grpc import GrpcInstrumentorServer
+from opentelemetry.instrumentation.grpc import GrpcInstrumentorClient
+
+# Set up resource attributes (service name is important for Grafana)
+resource = Resource(attributes={
+    "service.name": os.environ.get("SERVICE_NAME", "executor")
+})
+
+# Set up tracer provider and exporter
+trace.set_tracer_provider(TracerProvider(resource=resource))
+tracer_provider = trace.get_tracer_provider()
+otlp_exporter = OTLPSpanExporter(endpoint="http://observability:4317", insecure=True)
+span_processor = BatchSpanProcessor(otlp_exporter)
+tracer_provider.add_span_processor(span_processor)
+
+# Instrument gRPC
+GrpcInstrumentorServer().instrument()
+GrpcInstrumentorClient().instrument()
+
+logger.info("OpenTelemetry initialized for service: %s", os.environ.get("SERVICE_NAME"))
+# === OpenTelemetry End ===
+
 # This set of lines are needed to import the gRPC stubs.
 # The path of the stubs is relative to the current file, or absolute inside the container.
 # Change these lines only if strictly needed.
