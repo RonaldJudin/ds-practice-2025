@@ -402,7 +402,7 @@ def checkout():
         # Initialise the executor
         executor = futures.ThreadPoolExecutor(max_workers=3)
 
-        # Temporarily commented out for checkpoint 3
+        # Temporarily commented out for checkpoints 3 and 4
         """ # Initialise the order in the microservices and increment each's vector clock by 1
         vc["fraud_detection"] += 1
         print(vc)
@@ -526,6 +526,28 @@ def checkout():
         print(vc)
         # Update the vector clock in the order_id_request
         order_id_request["vector_clock"] = vc """
+
+        # THIS IS COPIED FROM ABOVE TO STOP SOME FRAUDULENT ORDERS
+        vc["fraud_detection"] += 1
+        fraud_detection_init_order = executor.submit(handle_init_order_fraud_detection, order_data)
+        wewait = fraud_detection_init_order.result()
+        order_id_request = {"order_id": order_id, "vector_clock": vc}
+        future_fd_cc = executor.submit(
+            handle_fraud_detection_cc, order_id_request
+        )
+        logger.info("Transaction Verification Service: Request sent.")
+        if not future_fd_cc.result().is_verified:
+            order_status_response = {
+                "orderId": order_id_request["order_id"],
+                "status": "Order Rejected - Credit Card Verification Failed",
+                "suggestedBooks": [],
+            }
+
+            logger.info(
+                "Fraud Detection Service: Credit Card doesn't work. Rejecting order."
+            )
+            return json.dumps(order_status_response), 200
+        # THIS IS COPIED FROM ABOVE TO STOP SOME FRAUDULENT ORDERS IT IS TO BE DELETED
 
         # Queue the order
         future_order_queue = executor.submit(

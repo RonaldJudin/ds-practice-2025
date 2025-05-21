@@ -3,7 +3,7 @@ import random
 import json
 
 # Single non-fraudulent order: Demonstrate a test scenario where a single non-fraudulent order is created from the frontend and verified for correctness.
-# This can be done manually.
+# This can be done manually or with Locust, but the corresponding Locust class would conflict with the other two scenarios realised with it.
 
 # Multiple non-fraudulent non-conflicting orders: Create automated tests to handle scenarios involving multiple simultaneous non-fraudulent orders that do not conflict with each other. Non-conflicting means, for instance, that the orders attempt to purchase different books. Eventually, you may add some delays in specific components, to simulate shorter or longer execution times for different orders.
 # This cannot be done manually, and Locust is also unable to do this because Locust users behave independently and randomly.
