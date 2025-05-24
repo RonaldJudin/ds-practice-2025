@@ -65,6 +65,24 @@ GrpcInstrumentorClient().instrument()
 
 logger.info("OpenTelemetry initialized for service: %s", os.environ.get("SERVICE_NAME"))
 # === OpenTelemetry End ===
+# === OpenTelemetry Metrics Init ===
+from opentelemetry.sdk.metrics import MeterProvider
+from opentelemetry.exporter.otlp.proto.grpc.metric_exporter import OTLPMetricExporter
+from opentelemetry.sdk.metrics.export import PeriodicExportingMetricReader
+from opentelemetry.metrics import get_meter_provider, set_meter_provider
+
+# Set up OTLP gRPC metric exporter
+otlp_metric_exporter = OTLPMetricExporter(endpoint="http://observability:4317", insecure=True)
+metric_reader = PeriodicExportingMetricReader(otlp_metric_exporter)
+meter_provider = MeterProvider(resource=resource, metric_readers=[metric_reader])
+set_meter_provider(meter_provider)
+meter = get_meter_provider().get_meter("order_queue_service")
+
+# UpDownCounter
+queue_size = meter.create_up_down_counter("active_queue_size")
+
+logger.info("OpenTelemetry metrics initialized for service: %s", os.environ.get("SERVICE_NAME"))
+# === OpenTelemetry Metrics End ===
 
 # gRPC stubs setup
 FILE = __file__ if "__file__" in globals() else os.getenv("PYTHONFILE", "")
@@ -125,6 +143,7 @@ class OrderQueueService(order_queue_grpc.OrderQueueServiceServicer):
         Returns:
             order_queue_pb2.EnqueueResponse: Contains the enqueued order_id
         """
+        queue_size.add(1)
         response = order_queue.EnqueueResponse()
         order_id = request.order_id
 
@@ -178,6 +197,7 @@ class OrderQueueService(order_queue_grpc.OrderQueueServiceServicer):
         # Thread-safe dequeue operation
         with self.lock:
             if self.heap:
+                queue_size.add(-1)
                 _, _, order_data = heapq.heappop(self.heap)
                 order_id = order_data["order_id"]
                 logger.info(f"Order {order_id} dequeued")

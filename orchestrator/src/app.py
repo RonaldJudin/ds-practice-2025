@@ -58,6 +58,28 @@ GrpcInstrumentorClient().instrument()
 logger.info("OpenTelemetry initialized for service: %s", os.environ.get("SERVICE_NAME"))
 # === OpenTelemetry End ===
 
+# === OpenTelemetry Metrics Init ===
+from opentelemetry.sdk.metrics import MeterProvider
+from opentelemetry.exporter.otlp.proto.grpc.metric_exporter import OTLPMetricExporter
+from opentelemetry.sdk.metrics.export import PeriodicExportingMetricReader
+from opentelemetry.metrics import get_meter_provider, set_meter_provider
+
+# Set up OTLP gRPC metric exporter
+otlp_metric_exporter = OTLPMetricExporter(endpoint="http://observability:4317", insecure=True)
+metric_reader = PeriodicExportingMetricReader(otlp_metric_exporter)
+meter_provider = MeterProvider(resource=resource, metric_readers=[metric_reader])
+set_meter_provider(meter_provider)
+meter = get_meter_provider().get_meter("orchestrator")
+
+# Example metrics instruments
+order_counter = meter.create_counter("orders_total")
+fraud_order_counter = meter.create_counter("fraud_orders_total")
+# UpDownCounter
+orders_queued = meter.create_up_down_counter("orders_queued")
+
+logger.info("OpenTelemetry metrics initialized for service: %s", os.environ.get("SERVICE_NAME"))
+# === OpenTelemetry Metrics End ===
+
 # This set of lines are needed to import the gRPC stubs.
 # The path of the stubs is relative to the current file, or absolute inside the container.
 # Change these lines only if strictly needed.
@@ -390,6 +412,8 @@ def checkout():
         - Logs the progress and results of fraud detection, transaction verification, and suggestions.
         - Logs errors if any occur during processing.
     """
+    # Counter
+    order_counter.add(1, {"endpoint": "/checkout"})
     try:
         # Init vector clock (originally initialized as a class, but changed to a dict for simplicity)
         vc = {
@@ -578,6 +602,8 @@ def checkout():
         )
         logger.info("Transaction Verification Service: Request sent.")
         if not future_fd_cc.result().is_verified:
+            # Increment Fraud Counter
+            fraud_order_counter.add(1)
             order_status_response = {
                 "orderId": order_id_request["order_id"],
                 "status": "Order Rejected - Credit Card Verification Failed",
@@ -595,6 +621,7 @@ def checkout():
             handle_order_queue, order_data
         )
         logger.info("Order Queue Service: Order queued.")
+        orders_queued.add(1)
 
         # Final response with books following the provided YAML specification for the bookstore
         order_status_response = {

@@ -328,3 +328,6 @@ services:
       - "4318:4318"
     environment:
       - OTEL_METRIC_EXPORT_INTERVAL=1000
+      - TEMPO_METRICS_GENERATOR_ENABLE=true
+      - TEMPO_METRICS_GENERATOR_REGISTRY_COLLECT_ALL=true
+      - TEMPO_METRICS_GENERATOR_PROCESSORS=service-graphs,span-metrics
