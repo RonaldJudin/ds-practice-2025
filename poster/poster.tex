@@ -35,6 +35,7 @@
 \renewcommand{\vec}[1]{\bm{#1}}
 \newcommand{\Tr}{\text{Tr}}
 \usepackage[T1]{fontenc}
+\usepackage[fontsize=28pt]{fontsize}
 
 
 \title{\parbox{0.8\linewidth}{A Distributed and Scalable Order Fulfillment Architecture for E-Commerce Platforms}}
@@ -50,11 +51,11 @@
 \begin{columns}
     \column{0.5}
     \block{Introduction}{
-       We propose a distributed order fulfillment architecture designed for high-throughput e-commerce platforms. Modern online retailers like Amazon need reliability during traffic spikes and consistency for concurrent orders. Our system addresses these with orchestrated parallel verification, priority-based task queuing, and fault-tolerant two-phase commits for payments and shipping.
+       We propose a distributed order fulfillment architecture designed for high-throughput e-commerce platforms. Modern online retailers need reliability during traffic spikes and consistency for concurrent orders. Our system addresses these with orchestrated parallel verification, priority-based task queuing, and fault-tolerant two-phase commits for payments and shipping.
 	}
 
     \block{System Model}{
-The system follows a distributed orchestration model. A client submits an order to the orchestrator, which initiates multithreaded parallel calls to the identity and inventory services. These services perform READ requests against the leader database to validate the request. After receiving APPROVED responses from both services, the orchestrator adds the order to a priority queue. Auto-scaling executors then process orders from the queue, coordinating two-phase commit (2PC) transactions with the shipping and payment services which guarantees ACID compliance for writes. After both services acknowledge (ACK) the Commit phase, the executor dequeues the order and triggers the notification service to inform the user. Throughout this workflow, the analytics service asynchronously logs requests, errors, and metrics for observability. The design prioritizes scalability (with auto-scaling and multithreading), consistency (with 2PC and leader DB reads), and fault tolerance (with queue-based retries and analytics monitoring).
+The system follows a distributed orchestration model. A client submits an order to the orchestrator, which initiates multithreaded parallel calls to the identity and inventory services. These services perform READ requests against the leader database to validate the request. After receiving APPROVED responses from both services, the orchestrator adds the order to a priority queue. Executors then process orders from the queue, coordinating two-phase commit (2PC) transactions with the shipping and payment services which guarantees ACID compliance for writes. After both services acknowledge (ACK) the Commit phase, the executor dequeues the order and triggers the notification service to inform the user. Throughout this workflow, the analytics service asynchronously logs requests, errors, and metrics for observability. The design prioritizes scalability (with auto-scaling and multithreading), consistency (with 2PC and leader DB reads), and fault tolerance (with queue-based retries and analytics monitoring).
 
 
        \begin{align*}
@@ -67,7 +68,7 @@ The system follows a distributed orchestration model. A client submits an order 
 
             \block{Replication}{
 
-Two types of replication are used in our distributed system. The executor service uses queue-based replication. The auto-scaling executors are stateless and rely on the priority queue for order assignment. Unlike database replication, orders persist in the queue until successfully processed (durable) and executors scale dynamically based on queue size (elastic). The database uses a synchronous leader-follower replication. The leader handles all writes and the followers serve read requests. This behavior allows for strong consistency (followers mirror leader state before acknowledging reads) and fault tolerance (automatic elections during leader replica failure minimizes database downtime).
+Two types of replication are used in our distributed system. The executor service uses queue-based replication. The executors are stateless and rely on the priority queue for order assignment. Orders persist in the queue until successfully processed and executors scale dynamically based on queue size. The database uses a synchronous leader-follower replication. The leader handles all writes and the followers serve read requests. Followers mirror leader state before acknowledging reads and automatic elections during the leader replica failure minimize database downtime.
 
        		\begin{align*}
         \includegraphics[width=0.45\textwidth,valign=c]{db_replication}
